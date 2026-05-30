@@ -1,0 +1,28 @@
+# <PROJECT_NAME> — Review Log
+
+Append-only. Never edit prior entries except to add `INVALIDATED` / `SUPERSEDED` /
+`RETRO` notations beside them. When this file passes ~1500 lines, archive the head
+into `REVIEW_LOG_archive_<YYYY-MM>.md` and start the live file from the current
+phase. Keep `## KILLED-REGISTER` and the most recent `RETRO` entry in the live file.
+
+---
+
+## KILLED-REGISTER
+
+Append-only register of dead hypotheses. Format:
+
+```
+H<n>: <one-line claim> — killed YYYY-MM-DD at <scale>, evidence <REVIEW_LOG entry id /
+artifact path>. Kill reason: <one sentence>.
+```
+
+If a kill is overturned by new evidence, add an `UNKILLED YYYY-MM-DD: <new evidence>`
+line below the original. Never delete.
+
+(No kills yet.)
+
+---
+
+## Per-turn entries
+
+(One line per turn. Format: `YYYY-MM-DD HH:MM | VERDICT | one-sentence summary | links`.)

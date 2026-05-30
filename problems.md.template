@@ -1,0 +1,165 @@
+# <PROJECT_NAME> — Goals and Anti-patterns
+
+> **Plan version: v1 (YYYY-MM-DD)** — bump on every amendment to this file.
+>
+> When this file conflicts with any other doc — `CLAUDE.md`, role files, runbooks —
+> **this file wins.** It is the single source of truth for what the project is for.
+
+---
+
+## §1. What this project is for
+
+One paragraph: what problem are we solving, who is the customer, what does success
+look like? Should be readable by someone joining the project on Day 1.
+
+### §1a. System summary
+
+What we're building (one or two paragraphs). Architecture, towers, modules — only
+enough that the goals below make sense.
+
+### §1b. Decisions already locked
+
+Decisions that are fixed and not up for re-litigation per ablation. Examples:
+backbone choice, retrieval framework, data source. Each entry has the date locked
+and the deciding evidence. Anything not listed here is open.
+
+### §1c. Decisions still open / under review
+
+Counter-list to §1b. Things you might think are locked but aren't. Mark with
+`UNDER REVIEW` so the Lead doesn't promote them silently.
+
+### §1d. Scale ladder
+
+Define the project's scales explicitly. Example:
+
+- **<ITERATION_SCALE>** — iteration scale; no paper claims; cheap fast loops.
+- **<PAPER_SCALE>** — paper-canonical scale; apples-to-apples vs all baselines.
+- **<PRODUCTION_SCALE>** — post-paper / A-B scale; never used for paper claims.
+
+Promotion gates between rungs require the goal-aligned eval matrix at the lower rung
+to PASS the pre-registration bands. Skipping rungs is anti-pattern.
+
+---
+
+## §2. The goals (G1–G_N)
+
+Numbered, one per goal. Each goal:
+- One sentence stating what it commits to.
+- The metric(s) it's measured against.
+- The cutoff (K, threshold, etc.).
+- The external baseline(s) it must beat AND the internal comparator it must not regress.
+
+Stubs to replace:
+
+### G1. <First goal — short title>
+
+**Claim:** <one sentence>.
+
+**Metrics:** <metric@cutoff list>.
+
+**External baselines (must beat):** <list>.
+
+**Internal comparator (must not regress):** <list>.
+
+**Decision rule:** <PASS / GREY / FAIL bands at iteration scale and paper scale>.
+
+### G2. <Second goal — short title>
+
+(repeat the structure)
+
+### G3. <Third goal — short title>
+
+(repeat the structure)
+
+---
+
+## §3. Tier 1 / Tier 2 metric definitions
+
+Tier 1 = headline metrics that promote / kill the project. Define each precisely:
+
+- Formula (with denominator).
+- Cohort split (warm / cold / homogeneous / etc.).
+- Cutoff K.
+- Significance protocol (seeds, correction, effect-size threshold).
+
+Tier 2 = secondary / diagnostic metrics. Same format, but a Tier 2 result alone
+cannot promote a paper-level claim.
+
+A change to any metric definition is a `problems.md` amendment with Plan-version
+bump — never edit in place silently.
+
+---
+
+## §4. External baselines vs internal comparator
+
+Make the distinction explicit (recurring source of confusion):
+
+- **External baselines** — established prior-art systems we must beat to claim a
+  contribution. List by name, configuration, and citation.
+- **Internal comparator** — the project's own canonical version. Used as a
+  regression gate. **Never** counted as a baseline win — beating yourself is not
+  a contribution.
+
+---
+
+## §5. Open questions (UNDER REVIEW)
+
+Questions the project is actively investigating that are not yet locked. Each
+entry has the question, the candidate answers, and the experiment that would
+resolve it. Move to §1b when locked, with the closing evidence.
+
+---
+
+## §6. Anti-patterns (A1–A_N)
+
+**Blocking patterns the team has hit before. Read before any experiment over
+<COMPUTE_THRESHOLD>.** New entries are appended (with date) when a new failure mode
+is observed in the wild — don't pre-populate guesses.
+
+Each entry:
+
+### A<n>. <One-line slug>
+
+**Pattern:** <what it looks like in code or analysis>.
+
+**Why it bites:** <the consequence — what wrong claim it produces>.
+
+**Caught how:** <the evidence pattern that surfaces it; e.g. `git log` query, retro
+check, reviewer flag>.
+
+**First observed:** YYYY-MM-DD, context.
+
+---
+
+## §7. Operating notes
+
+Cross-cutting reminders that don't fit elsewhere:
+- Compute threshold for pre-reg requirement: <COMPUTE_THRESHOLD>.
+- Reproducibility requirements summary (≥3 seeds for comparative claims, ≥5 for
+  paper-bound, Bonferroni/Holm for >3 variants, effect size with p-value).
+- Where the data catalog lives: <DATA_CATALOG_REF>.
+
+---
+
+## §8. Phase log (append-only)
+
+When a phase opens or closes, append a one-line entry. Phases are how the retro,
+tidy-up, and memory-staleness rules are anchored.
+
+```
+PHASE-OPEN  YYYY-MM-DD  <name> — <one-line scope>
+PHASE-CLOSE YYYY-MM-DD  <name> — <verdict + evidence ref>
+```
+
+---
+
+## Plan amendment template
+
+When you change anything above, paste this block at the top with a bumped Plan
+version. Don't rewrite §1d in place.
+
+```
+> **Plan v<N> (YYYY-MM-DD) amendments:**
+> 1. <one-line description>. See [[memory-name]] / REVIEW_LOG entry id.
+> 2. ...
+```

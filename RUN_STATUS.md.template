@@ -1,0 +1,37 @@
+# <PROJECT_NAME> — Run Status
+
+**Snapshot:** YYYY-MM-DD — STATUS: IDLE (no runs yet).
+**Working dir:** `/path/to/project`
+**Branch:** `mainline` (local-only; not pushed)
+
+---
+
+## In-flight
+
+(none)
+
+## Queued
+
+(none)
+
+## Recently closed (most recent two; older runs archive when this file > 500 lines)
+
+(none yet)
+
+---
+
+## Conventions
+
+Each in-flight run logs:
+- Job ID
+- Submitted UTC + status
+- Launch commit SHA
+- Pre-reg commit SHA (if run > <COMPUTE_THRESHOLD>)
+- Reviewer summary (`<N blockers / M high / K medium / J nits>`)
+- Dataset manifest (snapshot path, generation_date, lookback, filter convention vN)
+- Compute (instance × hours × $)
+- `requirements.lock.txt` S3 path
+
+24h staleness SLO: if a job marked InProgress hasn't had its status updated in >24h,
+query SageMaker (`aws sagemaker describe-processing-job` / `describe-training-job`)
+to reconcile before resuming.
