@@ -13,9 +13,10 @@ NOT govern sessions in this repo.
 - Prompts describe intent and principles, not fixed file layouts. Keep the hard
   invariants short and the mechanism guidance adaptive; instruct the executing
   model to probe current harness capabilities rather than trusting a snapshot.
-  Exception: `setup-dev-machine.md` legitimately carries fixed personal choices
-  in its SPEC section — those are the owner's preferences, not best-practice
-  claims; don't "modernize" them without the owner asking.
+  Exception: `setup-dev-machine.md` and `setup-claude-code.md` legitimately carry
+  fixed personal choices in their SPEC sections — those are the owner's
+  preferences, not best-practice claims; don't "modernize" them without the owner
+  asking.
 - Every prompt has a `Prompt version: vN (date)` header — bump it on any
   amendment and cite the motivating lesson in the commit message.
 - `gates/run-all.sh` is this repo's own gate suite (version headers + bump-on-change,
