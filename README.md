@@ -10,16 +10,18 @@ the target project — instead of copying a fixed boilerplate.
 |---|---|
 | [`prompts/setup-ml-research-system.md`](prompts/setup-ml-research-system.md) | Complex ML research — recsys, ranking, retrieval; expensive experiments, human-in-the-loop Lead/Scientist split, pre-registration, verdict discipline |
 | [`prompts/setup-engineering-system.md`](prompts/setup-engineering-system.md) | Standard product engineering — CMS, ERP, SaaS; backend / frontend / API / gRPC; spec-first, contract discipline, test gates |
+| [`prompts/setup-dev-machine.md`](prompts/setup-dev-machine.md) | Provisioning the dev machine itself — macOS / Linux / Windows / WSL2, fresh or partial; shell, tmux, Neovim/LazyVim, runtimes, ML CLI tooling; idempotent, proxy-aware, approval-gated |
 
 ## Usage
 
-1. Open an agent session at the root of your project (empty **or** existing).
+1. Open an agent session at the root of your project (empty **or** existing) — or,
+   for the machine prompt, anywhere on the target machine.
 2. Paste the entire relevant prompt.
 3. Answer the short interview; review the proposed plan; let it build.
 
-On a **non-empty project** the prompt audits what's already there and proposes a
-*keep / add / prune* upgrade — it adapts to your setup rather than imposing the
-template.
+On a **non-empty project** (or a partially set-up machine) the prompt audits what's
+already there and proposes a *keep / add / prune* upgrade — it adapts to your setup
+rather than imposing the template.
 
 ## Design philosophy
 
@@ -43,10 +45,13 @@ either failure.
 
 ## Evolving this repo
 
-When a generated system learns a project-agnostic lesson (a new failure mode, a
-gate worth standardizing, a harness capability worth exploiting), backport it to
-the relevant prompt here and note it in the prompt's history via the commit
-message. The prompts are living documents.
+Every prompt carries a **Prompt version** header — bump it on every amendment and
+cite the motivating lesson or incident in the commit message. When a generated
+system learns a project-agnostic lesson (a new failure mode, a gate worth
+standardizing, a harness capability worth exploiting), backport it to the relevant
+prompt here. The machine prompt goes further: its Phase A re-reviews the prompt
+itself on every run and proposes amendments before acting. The prompts are living
+documents.
 
 ## Reference
 

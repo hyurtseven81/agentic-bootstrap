@@ -13,9 +13,14 @@ NOT govern sessions in this repo.
 - Prompts describe intent and principles, not fixed file layouts. Keep the hard
   invariants short and the mechanism guidance adaptive; instruct the executing
   model to probe current harness capabilities rather than trusting a snapshot.
-- When editing a prompt, keep the two in structural parallel where their content
-  overlaps (recon → interview → invariants → principles → build → verify →
-  evolution loop) so lessons can be backported across them easily.
+  Exception: `setup-dev-machine.md` legitimately carries fixed personal choices
+  in its SPEC section — those are the owner's preferences, not best-practice
+  claims; don't "modernize" them without the owner asking.
+- Every prompt has a `Prompt version: vN (date)` header — bump it on any
+  amendment and cite the motivating lesson in the commit message.
+- When editing the two system prompts, keep them in structural parallel where
+  their content overlaps (recon → interview → invariants → principles → build →
+  verify → evolution loop) so lessons can be backported across them easily.
 - `reference/legacy-strict-template/` is frozen prior art — don't extend it;
   backport lessons into the prompts instead.
 - Conventional commits (`feat(prompts):`, `docs(readme):`, …).

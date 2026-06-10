@@ -1,5 +1,8 @@
 # Setup Prompt — Agentic ML Research Development System
 
+> **Prompt version: v1 (2026-06-10)** — bump on every amendment; cite the lesson or
+> incident that motivated it in the commit message.
+
 **How to use:** open an agent session (Claude Code or equivalent, strongest available
 model) at the root of your research project — empty or existing — and paste this
 entire prompt. The model will inspect the folder, interview you briefly, then build
