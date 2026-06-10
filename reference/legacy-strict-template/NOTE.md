@@ -11,3 +11,12 @@ killed-hypothesis register, scale-bound verdicts, retroactive invalidation, the
 loop-health retro checklist, frozen-artifact manifests, directory-hygiene rules.
 
 Do not extend this template — backport lessons into the prompts instead.
+
+## Known gap
+
+The `scientific-code-reviewer` agent definition that the role files, README step 6,
+and `init-research-project.sh` all reference was never part of this template — it
+lived at `~/.claude/agents/scientific-code-reviewer.md`, outside any project tree,
+and is not included here. Direct users of this template must supply their own
+reviewer agent; the adaptive prompts in `../../prompts/` instead generate a
+project-tailored reviewer at setup time, which is the recommended path.

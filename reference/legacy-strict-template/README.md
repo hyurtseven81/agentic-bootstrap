@@ -8,7 +8,7 @@ retro checklist, frozen-artifact integrity, etc.).
 ## Files
 
 ```
-research-protocol-template/
+legacy-strict-template/
 ├── CLAUDE.md                  # repo-root shared rules (loaded by both sessions)
 ├── lead/CLAUDE.md             # Lead Scientist role file
 ├── scientist/CLAUDE.md        # Scientist role file
@@ -28,10 +28,10 @@ research-protocol-template/
 
 2. **Copy the template into the new project.**
    ```bash
-   cp -r research-protocol-template/{lead,scientist,CLAUDE.md} /path/to/new-project/
-   cp research-protocol-template/problems.md.template /path/to/new-project/problems.md
-   cp research-protocol-template/RUN_STATUS.md.template /path/to/new-project/RUN_STATUS.md
-   cp research-protocol-template/REVIEW_LOG.md.template /path/to/new-project/REVIEW_LOG.md
+   cp -r legacy-strict-template/{lead,scientist,CLAUDE.md} /path/to/new-project/
+   cp legacy-strict-template/problems.md.template /path/to/new-project/problems.md
+   cp legacy-strict-template/RUN_STATUS.md.template /path/to/new-project/RUN_STATUS.md
+   cp legacy-strict-template/REVIEW_LOG.md.template /path/to/new-project/REVIEW_LOG.md
    mkdir -p /path/to/new-project/{preregs,tech-debt,reports,scripts,configs/ablations,docs}
    ```
    Or use `init-research-project.sh` (see below).
