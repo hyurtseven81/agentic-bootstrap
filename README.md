@@ -11,6 +11,7 @@ the target project — instead of copying a fixed boilerplate.
 | [`prompts/setup-ml-research-system.md`](prompts/setup-ml-research-system.md) | Complex ML research — recsys, ranking, retrieval; expensive experiments, human-in-the-loop Lead/Scientist split, pre-registration, verdict discipline |
 | [`prompts/setup-engineering-system.md`](prompts/setup-engineering-system.md) | Standard product engineering — CMS, ERP, SaaS; backend / frontend / API / gRPC; spec-first, contract discipline, test gates |
 | [`prompts/setup-dev-machine.md`](prompts/setup-dev-machine.md) | Provisioning the dev machine itself — macOS / Linux / Windows / WSL2, fresh or partial; shell, tmux, Neovim/LazyVim, runtimes, ML CLI tooling; idempotent, proxy-aware, approval-gated |
+| [`prompts/upgrade-live-project-preamble.md`](prompts/upgrade-live-project-preamble.md) | Companion preamble — prepend to a setup prompt when the target project is already **live** (runs in flight, current state files) to force audit-and-upgrade mode with explicit do-not-touch constraints |
 
 ## Usage
 
