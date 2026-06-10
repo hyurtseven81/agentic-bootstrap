@@ -1,6 +1,6 @@
 # Setup Prompt — Claude Code Harness Configuration
 
-> **Prompt version: v1 (2026-06-10)** — bump on every amendment; cite the lesson or
+> **Prompt version: v2 (2026-06-10)** — bump on every amendment; cite the lesson or
 > incident that motivated it in the commit message. Phase A re-evaluates this file
 > every run and proposes amendments when stale; after approval, backport them to
 > the canonical copy in the prompts repo.
@@ -76,6 +76,8 @@ Report: `claude --version`, `claude doctor` health, auth mode + plan/tier (e.g.
 via `/status` — subscription vs API key gates model and long-context
 availability), OS/shell. Inventory every scope and artifact: `~/.claude/settings.json`,
 `~/.claude.json`, `~/.claude/CLAUDE.md`, `~/.claude/agents/`, `~/.claude/skills/`,
+any legacy commands directory the installed version honors (`~/.claude/commands/`;
+a project's `.claude/commands/` only when I name a project),
 installed plugins + marketplaces, MCP servers and their scopes, hooks, statusline,
 the current default model, auto-memory state, and existing
 `~/.claude/projects/*/memory/` content. Produce a desired-vs-current action column
@@ -100,8 +102,9 @@ after I approve. If nothing is stale, say so in one line and continue.
 Ask only what Phase 0 couldn't answer:
 
 - Plan/tier if not detectable — it gates long-context availability and cost.
-- The 3–5 workflows I repeat most across projects (skill/plugin candidates) and
-  the integrations I actually use (MCP candidates). Propose; don't pre-install.
+- The 3–5 workflows I repeat most across projects (skill/plugin candidates —
+  beyond the SPEC's standing skills, which are already decided) and the
+  integrations I actually use (MCP candidates). Propose; don't pre-install.
 - Past pain: incidents where the agent did something I had to undo. Permission
   denies and hook guards are seeded from THESE answers, never from guesses.
 - Preferences with no safe default: telemetry posture, transcript retention
@@ -206,10 +209,28 @@ paragraph asking for care; every gate cites its failure mode; the set stays smal
   reviewers; the global one is the floor for everything else. (Projects built
   from `setup-ml-research-system.md` expect the global name
   `scientific-code-reviewer` — ask me before creating or renaming under it.)
-- **Skills:** only from the interview's repeated workflows. Personal skills at
-  `~/.claude/skills/<name>/SKILL.md` per the current format, each with a concrete
-  trigger description. No speculative library — the re-run prunes skills that
-  never fired.
+- **Skills:** the SPEC's standing skills plus the interview's repeated workflows —
+  nothing speculative. Interview-derived skills that never fire are pruned at
+  re-runs; standing skills are SPEC-fixed — report disuse, never prune them.
+  Personal skills at `~/.claude/skills/<name>/SKILL.md` per the current format
+  (arguments via the documented convention — `$ARGUMENTS` / indexed / named
+  frontmatter at authoring time, verify; set `argument-hint` for
+  discoverability — it is UI-only, not parsing), each with a concrete trigger
+  description.
+- **Reconcile existing commands — never duplicate, never bulldoze.** Inventory
+  every existing custom command and skill, including any legacy commands
+  directory the installed version still honors (at authoring time
+  `.claude/commands/*.md` and its user-scope equivalent still work, and a
+  same-named skill silently takes precedence — the shadowing trap). For each one
+  that a SPEC standing skill or interview workflow supersedes: keep its NAME and
+  invocation habits, port its content into the current skill format upgraded to
+  the SPEC's definition, show me the old-vs-new diff for approval, then retire
+  the old file non-destructively — rename it to its timestamped `.bak` (the
+  backup IS the retirement; nothing is deleted, and the vacated path goes into
+  `backups.manifest`) so exactly one implementation answers the name — and
+  record the migration in the run report. My existing prompt text is owner
+  content — improve it, never discard it silently; ported skills remain owner
+  content, and re-runs change them only via approved diffs.
 - **Plugins:** browse marketplaces only for gaps the interview surfaced; every
   install passes the supply-chain rule (a plugin can bundle skills, agents,
   hooks, and MCP servers — review what it ships, not just its name); prefer few
@@ -240,7 +261,12 @@ report.
   blocked despite auto-accept; each hook's positive and negative test passes; the
   fallback-model setting is present with the chosen value (config presence is the
   check — real failover can't be live-tested); agents, skills, and plugins are
-  listed and loadable; every MCP server connects.
+  listed and loadable; each SPEC standing skill resolves under its final name as
+  recorded in the run report's migration entry, with exactly one implementation
+  answering that name across personal skills, legacy commands, and
+  plugin-shipped skills; the deep-research skill body contains the current
+  orchestration trigger (or invokes the wrapped official capability); every MCP
+  server connects.
 - EMIT A DOCTOR SCRIPT: every non-interactive check above goes into
   `~/.devsetup/verify-claude-code.sh` so harness health is re-checkable without
   this prompt. Run it once; it must pass. Checks that are inherently interactive
@@ -282,6 +308,30 @@ be re-verified at run time.)
 - **Plugins & MCP:** interview-gated and supply-chain-vetted (source, author, and
   data exposure recorded), at user scope, secrets via `${VAR}` only; pruned on
   disuse at re-runs.
+- **Standing skills** (fixed personal skills; ensure they exist at user scope
+  and reconcile any existing same-purpose command per Phase 4, preserving my
+  names):
+  - `/deep-research <question>` — multi-source research: fan-out searches,
+    adversarial verification of claims against independent sources, synthesis
+    with citations. If the installed version ships an official deep-research
+    capability, prefer or wrap it rather than reimplementing. When
+    self-authoring, the skill runs under the harness's workflow orchestration —
+    at authoring time skill frontmatter CANNOT set ultracode (valid efforts stop
+    at `max`); the skill BODY carries the `ultracode` keyword and orchestration
+    instructions instead. Verify the current mechanism.
+  - `/review-paper <venue> <paper>` — conference-judge review for RecSys, CIKM,
+    KDD, NeurIPS, ICML, SIGIR (keep my existing review command's name if one
+    exists; paper = a file path, URL, or arXiv id — read or fetch it before
+    judging): venue-appropriate review form; structured output (summary,
+    contributions, strengths, weaknesses, questions for authors, scores +
+    confidence in the venue's conventions — verify the venue's current review
+    form when authoring or invoking, and if unverifiable use this generic
+    structure rather than fabricating a form); grounded in the paper's actual
+    text — quote what it judges, fabricate no citations; and always audit
+    evaluation rigor (baseline comparability, split/leakage risks, seeds and
+    significance, ablation coverage, effect sizes) — the same false-win failure
+    modes my research protocol defends against.
 - **Budget:** user-global `CLAUDE.md` stays a two-minute read; every hook, skill,
   agent, and allowlist entry cites its failure mode or workflow; re-runs prune
-  the ones that never fire.
+  the ones that never fire (standing skills exempt — disuse is reported, never
+  auto-pruned).
