@@ -36,6 +36,7 @@ TEMPLATE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 NAME=""
 KEY=""
 PROJECT_PATH=""
+# shellcheck disable=SC2016  # literal dollar amount, not an expansion
 COMPUTE_THRESHOLD='$50'
 ITERATION_SCALE="100K"
 PAPER_SCALE="10M"
@@ -89,8 +90,8 @@ fi
 MEMORY_PATH="$HOME/.claude/projects/$KEY/memory/"
 SCALE_LADDER="$ITERATION_SCALE → $PAPER_SCALE → $PRODUCTION_SCALE"
 
-# --- compute placeholder (escape \ and / for sed)
-sed_escape() { printf '%s' "$1" | sed -e 's/[\/&]/\\&/g'; }
+# --- escape \, | and & for the |-delimited sed substitutions below
+sed_escape() { printf '%s' "$1" | sed -e 's/[\\|&]/\\&/g'; }
 
 NAME_E=$(sed_escape "$NAME")
 KEY_E=$(sed_escape "$KEY")
@@ -126,8 +127,10 @@ TARGETS=(
   "$PROJECT_PATH/RUN_STATUS.md"
   "$PROJECT_PATH/REVIEW_LOG.md"
 )
+# portable in-place edit: GNU `sed -i` and BSD/macOS `sed -i ''` are
+# incompatible, so write to a temp file and move it back instead
 for f in "${TARGETS[@]}"; do
-  sed -i \
+  sed \
     -e "s|<PROJECT_NAME>|$NAME_E|g" \
     -e "s|<PROJECT_KEY>|$KEY_E|g" \
     -e "s|<MEMORY_PATH>|$MEM_E|g" \
@@ -138,7 +141,8 @@ for f in "${TARGETS[@]}"; do
     -e "s|<SCALE_LADDER>|$LADDER_E|g" \
     -e "s|<CANONICAL_CONFIG>|$CANON_E|g" \
     -e "s|<DATA_CATALOG_REF>|$CATALOG_E|g" \
-    "$f"
+    "$f" > "$f.tmp"
+  mv "$f.tmp" "$f"
 done
 
 # --- gitkeeps for empty dirs (so `git add` picks them up)

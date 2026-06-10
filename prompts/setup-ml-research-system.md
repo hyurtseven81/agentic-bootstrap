@@ -1,6 +1,6 @@
 # Setup Prompt — Agentic ML Research Development System
 
-> **Prompt version: v1 (2026-06-10)** — bump on every amendment; cite the lesson or
+> **Prompt version: v2 (2026-06-10)** — bump on every amendment; cite the lesson or
 > incident that motivated it in the commit message.
 
 **How to use:** open an agent session (Claude Code or equivalent, strongest available
@@ -145,6 +145,11 @@ boundaries by the decider role, not transcripts of events).
 a `handoffs/` file, not just pasted into chat. The human still carries it (timing and
 control unchanged), but the canonical record survives any session loss.
 
+**Review evidence is state too.** The reviewer subagent's raw findings are persisted
+to a file keyed to the commit it reviewed (e.g. `reviews/<sha>.md`), and the hand-off
+cites that path. The decider's gate becomes "review file exists at the cited SHA" —
+mechanically checkable — instead of a prose `Review: passed` line taken on trust.
+
 ### Defense in depth for long runs (failure mode 3)
 
 - **Golden-fixture eval tests before launch.** The eval harness must pass a test
@@ -168,6 +173,16 @@ control unchanged), but the canonical record survives any session loss.
   ran on the intended checkpoint (path + step cited), cohort/item counts match the
   data manifest, both arms saw identical eval conditions, metric reproduced through
   a second path or the golden fixture.
+- **Win autopsy before any claim-grade PASS** — invariant 2 cuts both ways, and the
+  classic false win is leakage. Before a win that would change the plan: temporal
+  split boundaries actually respected (no future information reaching features,
+  sampling, or eval), no train/eval overlap of the entities the claim generalizes
+  over, no duplicates across splits, eval ran on the intended checkpoint, and the
+  delta plausible against known baselines. A too-good-to-be-true number is a bug
+  hypothesis first, a result second.
+- **Crashes are reported as crashes** — never repackaged as results. A truncated
+  run's numbers enter the record only labelled "partial, crashed at step N", and a
+  partial number never feeds a verdict.
 - **Pre-registered failure explanations:** the pre-commitment includes "if this
   FAILs, the three most likely *non-scientific* explanations and the check that
   rules each out" — written at design time, when the model is neutral, not at
@@ -188,8 +203,11 @@ control unchanged), but the canonical record survives any session loss.
   re-reads the state files in a fixed order and states in one line where the loop
   stands before acting.
 - **Conflict order**, written down: goals doc > plan > scientific validity > human
-  preference > agent suggestion. Plan changes happen only via explicit, dated,
-  version-bumped amendments — silent redirection is the named enemy.
+  preference > agent suggestion. The order arbitrates whose *proposal* wins; it is
+  not a license to execute a plan discovered to be scientifically invalid — that
+  discovery triggers an amendment proposal, never silent deviation and never silent
+  compliance. Plan changes happen only via explicit, dated, version-bumped
+  amendments — silent redirection is the named enemy.
 - **Periodic retro** (every N review turns or at phase boundaries) that checks
   direction against goals, register health, debt accumulation, and — critically —
   a cumulative-delta sanity check: do the per-experiment deltas reported since the
@@ -216,12 +234,14 @@ amendment — never silent.
 
 Generate the system: a slim root instruction file (bootstrap ritual, invariants,
 ownership table, pointers), role files sized per Step 3, the goals doc seeded from
-the interview, the state files, a `handoffs/` directory, `gates/` scripts for every
-mechanically checkable rule (pre-commitment tamper checks, hand-off field validation,
-staleness checks), hooks where the harness supports them, the reviewer subagent
-definition, and memory initialization. One commit per coherent unit, conventional
-commit messages. Where the project already had working equivalents, adapt and keep
-their names — continuity beats uniformity.
+the interview, the state files, `handoffs/` and `reviews/` directories, `gates/`
+scripts for every mechanically checkable rule (pre-commitment tamper checks, hand-off
+field validation, staleness checks), hooks where the harness supports them, the
+reviewer subagent definition, and memory initialization. Gate scripts belong to the
+decider role in the ownership table: the executor never edits a gate to make a turn
+pass — weakening a gate is a directional change, exactly like rewriting a test. One
+commit per coherent unit, conventional commit messages. Where the project already had
+working equivalents, adapt and keep their names — continuity beats uniformity.
 
 ## Step 5 — Verify before handing over
 

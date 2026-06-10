@@ -1,6 +1,6 @@
 # Setup Prompt — Agentic Engineering Development System
 
-> **Prompt version: v1 (2026-06-10)** — bump on every amendment; cite the lesson or
+> **Prompt version: v2 (2026-06-10)** — bump on every amendment; cite the lesson or
 > incident that motivated it in the commit message.
 
 **How to use:** open an agent session (Claude Code or equivalent, strongest available
@@ -138,7 +138,9 @@ Whatever you name them, the system needs: a **conventions file** (the slim root
 instruction file: stack, commands, style, bootstrap ritual, ownership table);
 **decision records** (append-only, dated, why + rejected alternatives); a **task
 ledger** (what's in flight, what's blocked, what's next — granular enough that a
-fresh session can resume mid-feature); **specs** for non-trivial features; a
+fresh session can resume mid-feature, with a staleness rule: an in-progress entry no
+session has touched recently is reconciled against reality — branch, diff, CI state —
+before being believed); **specs** for non-trivial features; a
 **known-issues / anti-pattern register** seeded from the human's past pain and
 appended to when something actually bites. Memory, if the harness provides it,
 stores distilled *patterns* (what approach worked, what to avoid and why), not
@@ -162,6 +164,8 @@ event transcripts.
 - **Migrations:** forward-only, reversible where the platform allows, never
   destructive without a gate (invariant 3), always tested against a realistic
   snapshot before production.
+- **Deploys:** every deploy ships with a stated rollback path; a deploy that cannot
+  be rolled back is a destructive action and gated as one (invariant 3).
 - **Security floor:** input validation at every boundary, authn/authz checks on
   every new endpoint, no secrets in code or logs, dependency audit in CI. New
   attack surface (file upload, webhooks, auth flows) gets an explicit security
@@ -176,8 +180,9 @@ event transcripts.
 Every substantive diff goes through the reviewer subagent before the human sees
 it: correctness, contract impact, security, test adequacy. Blockers are fixed or
 explicitly rebutted — never silently ignored. The reviewer's findings summary
-travels with the work report, and raw reviewer output is preserved where the human
-can audit it. The reviewer is read-only and never owns direction.
+travels with the work report, and raw reviewer output is preserved in the repo,
+keyed to the commit it reviewed, where the human can audit it — a prose "review
+passed" claim is not evidence. The reviewer is read-only and never owns direction.
 
 ### Rule budget — the system must stay small
 
@@ -203,8 +208,10 @@ repo (mark them as inferred, ask the human to confirm), the task ledger, the spe
 directory, `gates/` scripts and hooks for everything mechanically checkable (test
 runner, lint/typecheck, contract-diff check, migration-safety check, destructive-
 command guard), CI wiring if the project ships, and the reviewer subagent
-definition. One commit per coherent unit, conventional messages. Where the project
-already had working equivalents, adapt and keep their names.
+definition. Changing or weakening a gate requires explicit human sign-off, exactly
+like rewriting a test — never a side effect of making a task pass. One commit per
+coherent unit, conventional messages. Where the project already had working
+equivalents, adapt and keep their names.
 
 ## Step 5 — Verify before handing over
 
