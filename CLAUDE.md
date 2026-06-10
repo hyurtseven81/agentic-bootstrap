@@ -18,6 +18,9 @@ NOT govern sessions in this repo.
   claims; don't "modernize" them without the owner asking.
 - Every prompt has a `Prompt version: vN (date)` header — bump it on any
   amendment and cite the motivating lesson in the commit message.
+- `gates/run-all.sh` is this repo's own gate suite (version headers + bump-on-change,
+  structural parallel of the two system prompts, internal links, shellcheck). Run it
+  before committing; CI runs the same script on every PR.
 - When editing the two system prompts, keep them in structural parallel where
   their content overlaps (recon → interview → invariants → principles → build →
   verify → evolution loop) so lessons can be backported across them easily.

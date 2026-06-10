@@ -46,7 +46,11 @@ either failure.
 ## Evolving this repo
 
 Every prompt carries a **Prompt version** header — bump it on every amendment and
-cite the motivating lesson or incident in the commit message. When a generated
+cite the motivating lesson or incident in the commit message. The repo applies its
+own gates-over-prose rule to itself: CI runs [`gates/run-all.sh`](gates/run-all.sh)
+on every PR — version headers present and bumped on any prompt change, the two
+system prompts' section skeletons in structural parallel, internal links resolving,
+shellcheck clean. Run it locally before pushing. When a generated
 system learns a project-agnostic lesson (a new failure mode, a gate worth
 standardizing, a harness capability worth exploiting), backport it to the relevant
 prompt here. The machine prompt goes further: its Phase A re-reviews the prompt
