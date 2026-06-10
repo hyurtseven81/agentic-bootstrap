@@ -1,6 +1,6 @@
 # Setup Prompt — Claude Code Harness Configuration
 
-> **Prompt version: v2 (2026-06-10)** — bump on every amendment; cite the lesson or
+> **Prompt version: v3 (2026-06-10)** — bump on every amendment; cite the lesson or
 > incident that motivated it in the commit message. Phase A re-evaluates this file
 > every run and proposes amendments when stale; after approval, backport them to
 > the canonical copy in the prompts repo.
@@ -322,15 +322,29 @@ be re-verified at run time.)
   - `/review-paper <venue> <paper>` — conference-judge review for RecSys, CIKM,
     KDD, NeurIPS, ICML, SIGIR (keep my existing review command's name if one
     exists; paper = a file path, URL, or arXiv id — read or fetch it before
-    judging): venue-appropriate review form; structured output (summary,
-    contributions, strengths, weaknesses, questions for authors, scores +
-    confidence in the venue's conventions — verify the venue's current review
-    form when authoring or invoking, and if unverifiable use this generic
-    structure rather than fabricating a form); grounded in the paper's actual
-    text — quote what it judges, fabricate no citations; and always audit
-    evaluation rigor (baseline comparability, split/leakage risks, seeds and
-    significance, ablation coverage, effect sizes) — the same false-win failure
-    modes my research protocol defends against.
+    judging). Three stages:
+    1. *Form.* Resolve the venue's current review form and platform at
+       invocation — most of my venues run EasyChair (overall score on the
+       venue's scale with its labels, reviewer confidence, free-text body);
+       others use OpenReview-style structured forms (summary, strengths,
+       weaknesses, questions, limitations, per-axis scores). Render the review
+       paste-ready for that form; if the form can't be verified, use the
+       generic structure in stage 3 and say so — never fabricate a form.
+    2. *Novelty via research.* The novelty/contribution judgment is
+       research-backed, not text-only: run the deep-research skill (or an
+       inline scoped search) over the paper's core claims — closest prior art,
+       whether a claimed contribution already exists, missing citations or
+       stronger baselines the authors should have compared against. Cite what
+       the search actually found (real venues and years only); if search is
+       unavailable, label the novelty assessment "text-only — prior art
+       unverified" rather than guessing.
+    3. *Judgment.* Structured output (summary, contributions, strengths,
+       weaknesses, questions for authors, scores + confidence in the venue's
+       conventions); grounded in the paper's actual text — quote what it
+       judges, fabricate no citations; and always audit evaluation rigor
+       (baseline comparability, split/leakage risks, seeds and significance,
+       ablation coverage, effect sizes) — the same false-win failure modes my
+       research protocol defends against.
 - **Budget:** user-global `CLAUDE.md` stays a two-minute read; every hook, skill,
   agent, and allowlist entry cites its failure mode or workflow; re-runs prune
   the ones that never fire (standing skills exempt — disuse is reported, never
