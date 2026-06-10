@@ -1,15 +1,16 @@
 # Setup Prompt — Claude Code Harness Configuration
 
 > **Prompt version: v1 (2026-06-10)** — bump on every amendment; cite the lesson or
-> incident that motivated it in the commit message. Phase A proposes amendments to
-> this file on every run; after approval, backport them to the canonical copy in
-> the prompts repo.
+> incident that motivated it in the commit message. Phase A re-evaluates this file
+> every run and proposes amendments when stale; after approval, backport them to
+> the canonical copy in the prompts repo.
 
 **How to use:** open a Claude Code session on the machine whose harness you are
 configuring (any directory — the target is user-scope config) and paste this entire
 prompt. For this setup run approvals stay ON by design — the agent inventories,
-plans, asks, then acts; the auto-accept posture it *configures* (see SPEC) applies
-to later sessions, not to this run.
+plans, asks, then acts; the auto-accept posture it *configures* (see SPEC) is for
+later sessions, and regardless of when a written mode change takes effect, this
+run keeps asking before every mutating unit.
 
 Scope: the **agent harness itself** — model + context defaults, auto-memory,
 permissions, hooks, sandbox, subagents, skills, plugins, MCP servers — at user
@@ -25,8 +26,8 @@ This command file IS the source of truth — no external dotfiles repo or sync
 service. The SPEC at the bottom defines my fixed choices and required outcomes.
 Author the config to satisfy the SPEC using the harness's CURRENT documented
 mechanisms: the specifics in this prompt were verified against the official docs
-on 2026-06-10, and the harness ships weekly — on any mismatch the current docs
-win, and Phase A reports the drift. Never write a settings key, model name, or
+on 2026-06-10, and the harness ships frequently — on any mismatch the current
+docs win, and Phase A reports the drift. Never write a settings key, model name, or
 feature flag you have not confirmed against the installed version's docs or
 `--help` output.
 
@@ -42,6 +43,11 @@ feature flag you have not confirmed against the installed version's docs or
   (`jq` or equivalent) before and after; PRESERVE every key you don't manage —
   reconcile, never regenerate a file wholesale. JSON carries no comments, so the
   run report (not the file) records each key this setup owns, its value, and why.
+- MARKDOWN DISCIPLINE: in Markdown artifacts this setup writes into
+  (`~/.claude/CLAUDE.md`), authored content lives between managed sentinel blocks
+  (HTML comments, one block per unit) — re-runs replace block content in place;
+  everything outside the blocks is MINE and preserved untouched; changes to MY
+  lines happen only through a diff I approve.
 - NARROWEST SCOPE: personal defaults at user scope (`~/.claude/settings.json`);
   project scope only when I name a project; `settings.local.json` for experiments.
 - SUPPLY CHAIN: plugins, marketplaces, MCP servers, and hooks are code that runs
@@ -118,13 +124,20 @@ Mechanism — as verified at authoring time, re-verify per Phase A:
   resolves to and that the resolution carries the largest available context: at
   authoring time the frontier model runs a 1M-token window natively, while earlier
   strong models take an explicit `[1m]` suffix (e.g. `opus[1m]`, `sonnet[1m]`)
-  whose availability is plan-gated.
+  whose availability is plan-gated. If no alias carries the largest context, set
+  the explicit suffixed model id instead and record that evergreen tracking was
+  traded for context — re-runs re-check whether an alias can take over.
 - If strongest-available and largest-context ever diverge on this account (the
   strongest model capping below an older model's 1M variant): surface the
-  tradeoff with cost notes and let me pick the default; configure the loser as a
-  named one-command switch. Never silently pick either.
-- Configure a fallback chain (`fallbackModel` where supported) so provider
-  incidents degrade to the next-strongest model instead of blocking work.
+  tradeoff with cost notes and let me pick the default; the non-default becomes a
+  one-command switch (a documented `/model` invocation or shell alias, recorded
+  in the run report) so Phase 6 can verify it. Never silently pick either.
+- Configure a fallback model (`fallbackModel` where supported — a chain where the
+  mechanism allows) so provider incidents degrade to the next-strongest model
+  instead of blocking work.
+- Statusline: author the version's documented statusline mechanism (a minimal
+  script printing at least the active model — verify the settings key) so the
+  visibility outcome below has an authoring step, not just a check.
 - Reasoning/effort: leave adaptive reasoning defaults alone unless the docs
   expose an effort control that materially fits my usage; if a fixed
   thinking-budget mechanism applies to the chosen model, set it deliberately and
@@ -190,9 +203,9 @@ paragraph asking for care; every gate cites its failure mode; the set stays smal
   under `~/.claude/agents/` — read-only tools, strongest model, an explicit
   "never edits, never runs jobs" charter, frontmatter per the current agent
   format. Projects built by the system prompts generate their own tailored
-  reviewers; the global one is the floor for everything else. (The research
-  template family expects the name `scientific-code-reviewer` — ask me before
-  creating or renaming under that name.)
+  reviewers; the global one is the floor for everything else. (Projects built
+  from `setup-ml-research-system.md` expect the global name
+  `scientific-code-reviewer` — ask me before creating or renaming under it.)
 - **Skills:** only from the interview's repeated workflows. Personal skills at
   `~/.claude/skills/<name>/SKILL.md` per the current format, each with a concrete
   trigger description. No speculative library — the re-run prunes skills that
@@ -215,12 +228,19 @@ report.
 
 ## Phase 6 — Verify & report
 
+- FIXTURE RULE: every probe that exercises a gate, an edit, or memory runs inside
+  a disposable fixture (a scratch directory / throwaway git repo), using the most
+  harmless representative of each denied class — a mis-syntaxed rule must not
+  execute the destructive operation it was meant to block, and probes must not
+  litter a real project.
 - Fresh-probe checklist: intended model + context reported; statusline shows the
-  model; auto-memory active (memory dir gains content after a real task); one
-  allowed read-only op runs without a prompt; an in-scope edit proceeds without a
-  prompt (automode active); one denied destructive op is blocked despite
-  auto-accept; each hook's positive and negative test passes; agents, skills, and
-  plugins are listed and loadable; every MCP server connects.
+  model; auto-memory active (memory dir gains content after a real task in the
+  fixture); one allowed read-only op runs without a prompt; an in-scope edit
+  proceeds without a prompt (automode active); one denied destructive op is
+  blocked despite auto-accept; each hook's positive and negative test passes; the
+  fallback-model setting is present with the chosen value (config presence is the
+  check — real failover can't be live-tested); agents, skills, and plugins are
+  listed and loadable; every MCP server connects.
 - EMIT A DOCTOR SCRIPT: every non-interactive check above goes into
   `~/.devsetup/verify-claude-code.sh` so harness health is re-checkable without
   this prompt. Run it once; it must pass. Checks that are inherently interactive
@@ -246,17 +266,22 @@ be re-verified at run time.)
   the frontier model runs 1M natively; earlier strong models take the `[1m]`
   suffix, plan-gated. On any strongest-vs-longest divergence: surface it, ask,
   and configure the non-default as a named switch.
-- **Fallback:** a fallback chain to the next-strongest model, where supported.
-- **Auto-memory:** ON at user scope; no project may disable it silently.
+- **Fallback:** a fallback model (chain where supported) to the next-strongest.
+- **Auto-memory:** ON at user scope; re-runs flag any scope that disables it.
 - **Statusline:** always displays the active model — a wrong-model session must
   be visible at a glance.
 - **Posture (automode):** sessions default to auto-accept edits
-  (`defaultMode: acceptEdits` at authoring time); broad read-only allowlist;
-  destructive classes explicitly deny/ask — they must bind despite auto-accept;
+  (`defaultMode: acceptEdits` at authoring time); a read-only allowlist broad
+  within its classes, every entry still cited; destructive classes explicitly
+  deny/ask — they must bind despite auto-accept;
   sandbox on where supported. With per-edit prompts off, gates and hooks are the
   primary defense and get first-class tests. Full-bypass mode comes only from me
   launching with it deliberately, never from configuration.
-- **Reviewer:** a global read-only reviewer subagent exists at user scope.
+- **Reviewer:** a global read-only reviewer subagent exists at user scope — the
+  floor reviewer for projects without a tailored one.
+- **Plugins & MCP:** interview-gated and supply-chain-vetted (source, author, and
+  data exposure recorded), at user scope, secrets via `${VAR}` only; pruned on
+  disuse at re-runs.
 - **Budget:** user-global `CLAUDE.md` stays a two-minute read; every hook, skill,
   agent, and allowlist entry cites its failure mode or workflow; re-runs prune
   the ones that never fire.
