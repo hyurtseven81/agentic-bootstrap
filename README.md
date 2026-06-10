@@ -1,125 +1,58 @@
-# Two-role research-project protocol — porting template
+# Agentic Development System — Setup Prompts
 
-Generalized operating protocol for any ML research project that benefits from the
-Lead-Scientist + Reviewer split. Use this when starting a new project and you want
-the same rigor scaffolding (sealed pre-registration, killed-hypothesis register,
-retro checklist, frozen-artifact integrity, etc.).
+Self-contained prompts that, when run through a frontier model (Claude Opus/Fable
+in Claude Code or equivalent), **set up a tailored agentic development system** in
+the target project — instead of copying a fixed boilerplate.
 
-## Files
+## The prompts
 
-```
-research-protocol-template/
-├── CLAUDE.md                  # repo-root shared rules (loaded by both sessions)
-├── lead/CLAUDE.md             # Lead Scientist role file
-├── scientist/CLAUDE.md        # Scientist role file
-├── problems.md.template       # goals + anti-patterns scaffold (the source of truth)
-├── RUN_STATUS.md.template     # empty status file
-├── REVIEW_LOG.md.template     # empty review log with KILLED-REGISTER header
-└── README.md                  # this file
-```
+| Prompt | For |
+|---|---|
+| [`prompts/setup-ml-research-system.md`](prompts/setup-ml-research-system.md) | Complex ML research — recsys, ranking, retrieval; expensive experiments, human-in-the-loop Lead/Scientist split, pre-registration, verdict discipline |
+| [`prompts/setup-engineering-system.md`](prompts/setup-engineering-system.md) | Standard product engineering — CMS, ERP, SaaS; backend / frontend / API / gRPC; spec-first, contract discipline, test gates |
 
-## Sequence to port
+## Usage
 
-**Order matters — `problems.md` first, because the role files cite it constantly.**
+1. Open an agent session at the root of your project (empty **or** existing).
+2. Paste the entire relevant prompt.
+3. Answer the short interview; review the proposed plan; let it build.
 
-1. **Pick the project key.** Lowercase kebab-case (e.g. `myproject`,
-   `seq-rec`, `topic-routing`). This becomes the memory path and the slug used
-   in commits.
+On a **non-empty project** the prompt audits what's already there and proposes a
+*keep / add / prune* upgrade — it adapts to your setup rather than imposing the
+template.
 
-2. **Copy the template into the new project.**
-   ```bash
-   cp -r research-protocol-template/{lead,scientist,CLAUDE.md} /path/to/new-project/
-   cp research-protocol-template/problems.md.template /path/to/new-project/problems.md
-   cp research-protocol-template/RUN_STATUS.md.template /path/to/new-project/RUN_STATUS.md
-   cp research-protocol-template/REVIEW_LOG.md.template /path/to/new-project/REVIEW_LOG.md
-   mkdir -p /path/to/new-project/{preregs,tech-debt,reports,scripts,configs/ablations,docs}
-   ```
-   Or use `init-research-project.sh` (see below).
+## Design philosophy
 
-3. **Substitute the placeholders.** All template files use these — search-and-replace
-   per project:
+These prompts deliberately avoid strict, frozen rulebooks. Each one carries:
 
-   | Placeholder | Meaning | Example |
-   |---|---|---|
-   | `<PROJECT_NAME>` | Human-readable name | `MyProject` |
-   | `<PROJECT_KEY>` | Memory path slug, kebab-case | `myproject` |
-   | `<MEMORY_PATH>` | Full memory dir | `~/.claude/projects/myproject/memory/` |
-   | `<COMPUTE_THRESHOLD>` | $-amount above which pre-reg required | `$50` |
-   | `<ITERATION_SCALE>` | Cheap exploration scale | `100K` |
-   | `<PAPER_SCALE>` | Canonical apples-to-apples scale | `10M` |
-   | `<PRODUCTION_SCALE>` | Post-paper / A-B scale | `100M` |
-   | `<SCALE_LADDER>` | e.g. `100K → 10M → 100M` | same |
-   | `<CANONICAL_CONFIG>` | Default-config filename | `configs/main.yaml` |
-   | `<DATA_CATALOG_REF>` | Where data sources are catalogued | `(none — describe in problems.md §7)` |
-   | `<NUM_GOALS>` | How many G-goals you've defined | `8` |
-   | `<NUM_ANTIPATTERNS>` | How many A-anti-patterns | `12` |
+- **A small set of hard invariants** — anti-fabrication, append-only history,
+  pre-commitment before expensive/irreversible actions, mechanical gates over
+  prose. These never bend; they're the floor that keeps an agent honest.
+- **Principles and a mechanism menu** — adapted to the project's domain, phase,
+  and risk profile at setup time, not copied verbatim.
+- **A self-evolution loop** — the generated system retros itself, prunes rules
+  that never fire, amends itself with dated version bumps, and re-checks current
+  harness capabilities (hooks, subagents, memory, …) at each phase boundary. The
+  prompt instructs the model to probe what the tooling can do *now* rather than
+  trusting this repo's snapshot — the AI/LLM space moves faster than any
+  document.
 
-   Quick sed (review the diff before committing):
-   ```bash
-   cd /path/to/new-project
-   for f in CLAUDE.md lead/CLAUDE.md scientist/CLAUDE.md problems.md; do
-     sed -i \
-       -e 's|<PROJECT_NAME>|MyProject|g' \
-       -e 's|<PROJECT_KEY>|myproject|g' \
-       -e 's|<MEMORY_PATH>|~/.claude/projects/myproject/memory/|g' \
-       -e 's|<COMPUTE_THRESHOLD>|\$50|g' \
-       "$f"
-     # … add more substitutions
-   done
-   git diff
-   ```
+The reasoning: pure principles drift, pure rules rot. A thin invariant floor plus
+an explicit amendment mechanism is what keeps multi-week agentic projects from
+either failure.
 
-4. **Fill in `problems.md`.** The template has G1–G3 stubs; replace with your real
-   goals, external baselines, and an empty A-anti-pattern list (you'll add to it as
-   you hit anti-patterns in the wild — don't pre-populate guesses).
+## Evolving this repo
 
-5. **Initialize curated memory.** Create the directory and a stub MEMORY.md:
-   ```bash
-   mkdir -p ~/.claude/projects/<PROJECT_KEY>/memory/
-   echo "# <PROJECT_NAME> curated memory index" > ~/.claude/projects/<PROJECT_KEY>/memory/MEMORY.md
-   ```
+When a generated system learns a project-agnostic lesson (a new failure mode, a
+gate worth standardizing, a harness capability worth exploiting), backport it to
+the relevant prompt here and note it in the prompt's history via the commit
+message. The prompts are living documents.
 
-6. **Confirm the reviewer agent is available.** It lives globally at
-   `~/.claude/agents/scientific-code-reviewer.md` and is project-agnostic — no
-   per-project copy needed. Confirm it exists; if not, copy it from a project that
-   has it.
+## Reference
 
-7. **Initialize git in the project (if not already), and commit the scaffold:**
-   ```bash
-   git init && git add . && git commit -m "feat(scaffold): two-role protocol from template"
-   ```
-
-## Phased adoption — don't enforce everything Day 1
-
-Some rules earn their cost only at paper-stage. A fresh project doesn't need
-sealed pre-regs, frozen artifacts, or scale-bound verdicts on Day 1. Suggested
-phasing (you decide which paragraphs to keep / strip / comment-out):
-
-- **Phase 0 (exploration, weeks 1–2):** auto-route to reviewer, local commits,
-  dataset manifest, conventional commits. Skip pre-reg, scale-bound verdicts,
-  frozen artifacts, retro checklist (no REVIEW_LOG entries to retro yet).
-- **Phase 1 (baselines reproduced, ablations starting):** add ≥3-seed rule,
-  retroactive-invalidation, anti-fabrication citation, killed-register, retro
-  every ~25 entries.
-- **Phase 2 (paper claims active):** all rules live — pre-reg gate, GREY-band,
-  scale-bound verdicts, frozen artifacts, full retro checklist.
-
-The role files don't gate themselves — comment-out / un-comment as you cross phases.
-
-## Improving the template
-
-When you find a rule that helps on one project, backport it here so the next
-project starts with it. The flow:
-
-1. Apply on the project's `lead/CLAUDE.md` or `scientist/CLAUDE.md`.
-2. If the rule is project-agnostic, mirror it in the template files.
-3. Bump the template's `Plan version` line (one is in the template's shared
-   `CLAUDE.md`) so future projects know which template revision they started
-   from.
-
-## What's NOT in the template (intentionally)
-
-- Project-specific goals / anti-patterns / scale ladders / config filenames.
-- The `scientific-code-reviewer` agent itself (it's already global).
-- Memory content (each project has its own).
-- `problems.md` body (the template has stubs only).
+`reference/legacy-strict-template/` holds the original v1 fixed boilerplate
+(two-role Lead/Scientist protocol with fully specified role files). It's
+superseded as a copy-paste artifact but kept as prior art — the battle-tested
+mechanisms in it (pre-reg tamper checks, killed-register, retro checklist,
+frozen-artifact manifests) informed the prompts and remain useful reading when
+deciding which mechanisms a mature project should adopt.
