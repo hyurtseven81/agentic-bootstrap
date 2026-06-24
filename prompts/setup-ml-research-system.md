@@ -1,6 +1,6 @@
 # Setup Prompt — Agentic ML Research Development System
 
-> **Prompt version: v2 (2026-06-10)** — bump on every amendment; cite the lesson or
+> **Prompt version: v3 (2026-06-24)** — bump on every amendment; cite the lesson or
 > incident that motivated it in the commit message.
 
 **How to use:** open an agent session (Claude Code or equivalent, strongest available
@@ -117,15 +117,21 @@ it. Keep this list short — its power is that there are few of them.
 The proven pattern for serious projects is a **decider/executor split**: a Lead
 session that owns direction, goals, and verdicts (and never runs jobs), and a
 Scientist session that develops, launches, and reports (and never edits the Lead's
-files) — with the human hand-carrying hand-offs between them as the control gate,
-and a read-only **reviewer subagent** giving the Scientist pre-hand-off code review.
+files) — with the human hand-carrying hand-offs between them as the control gate.
+Two read-only reviewer subagents serve the split: a **code reviewer** giving the
+executor a pre-hand-off scientific-correctness pass, and a **direction reviewer**
+giving the *decider* a goal-alignment pass on its highest-stakes, hard-to-reverse
+calls (see *Drift defense*). Neither subagent owns direction; both persist findings
+to files keyed to what they reviewed.
 
 But the split must earn its cost. For a solo exploration-phase project, a single
-session with a reviewer subagent plus the invariants may be enough; install the
-two-session split when claims start carrying weight. Whatever topology you choose:
-each role's identity is determined by something mechanical (launch directory,
-explicit file), never inferred from conversation; and one writer per file, with an
-explicit ownership table, so sessions never clobber each other.
+session with the code reviewer plus the invariants may be enough — though the
+direction reviewer earns its place the moment the loop runs long experiments whose
+local results can capture the agenda (see *Drift defense*); install the two-session
+split when claims start carrying weight. Whatever topology you choose: each role's
+identity is determined by something mechanical (launch directory, explicit file),
+never inferred from conversation; and one writer per file, with an explicit
+ownership table, so sessions never clobber each other.
 
 ### State files — the minimum durable set
 
@@ -141,14 +147,28 @@ summarize the most recent kills in every hand-off); and **curated memory** (dist
 *patterns* — what worked, what didn't, under what conditions — written at phase
 boundaries by the decider role, not transcripts of events).
 
-**Hand-offs are state too.** The block each role writes for the other is committed to
-a `handoffs/` file, not just pasted into chat. The human still carries it (timing and
-control unchanged), but the canonical record survives any session loss.
+**Hand-offs are state too — and symmetric.** Both roles write the block they hand the
+other to a durable `handoffs/` file, not just pasted into chat — the *same* mechanism
+in both directions, so neither role is "the one that emits a file" and the other "the
+one that emits chat text" (that asymmetry is a real source of human confusion). The
+human still hand-carries the block (timing and control unchanged); the file is the
+canonical record that survives session loss. Make carrying frictionless with a single
+**carry command** — implement it with whatever the harness offers (a `/copy` slash
+command or skill is the natural fit). Run in the source session, it: detects the
+current role mechanically, surfaces the hand-off written *for the other session* — the
+latest by default, or a short pick-list if several are live — as one clean copy-paste
+block, and, if the freshest in-chat hand-off is newer than the committed file (the
+role forgot to commit), says so and asks which to copy. The human pastes that block
+into the other session and never opens the `.md` by hand; the interaction is identical
+in both directions.
 
-**Review evidence is state too.** The reviewer subagent's raw findings are persisted
-to a file keyed to the commit it reviewed (e.g. `reviews/<sha>.md`), and the hand-off
-cites that path. The decider's gate becomes "review file exists at the cited SHA" —
-mechanically checkable — instead of a prose `Review: passed` line taken on trust.
+**Review evidence is state too.** Each reviewer's raw findings are persisted to a file
+keyed to what it reviewed — the code reviewer to the commit (e.g. `reviews/<sha>.md`),
+the direction reviewer to the verdict or amendment it checked — and the hand-off cites
+the path. Gates become "review file exists at the cited SHA/id" — mechanically
+checkable — instead of a prose `Review: passed` line taken on trust: the decider
+checks the code-review file before approving a launch, and the human sees the
+direction-review file beside any claim-grade verdict.
 
 ### Defense in depth for long runs (failure mode 3)
 
@@ -202,6 +222,35 @@ mechanically checkable — instead of a prose `Review: passed` line taken on tru
 - **Bootstrap ritual:** on session start and after any context compaction, each role
   re-reads the state files in a fixed order and states in one line where the loop
   stands before acting.
+- **Headline anchor every turn.** The chronic, expensive form of drift is
+  *local-result capture*: after a long experiment the decider adopts the sub-result as
+  the objective — fixating on one ablation cell ("the model is weak at K=1") while the
+  headline claim that ablation was only *serving* (does multi-interest ensembling of the
+  upstream embeddings beat the baseline?) slips out of view, and the human has to keep
+  steering it back. Defend it structurally: register every experiment with its **role**
+  — *headline claim* vs *instrumental-for-G<n>* (an ablation/diagnostic in service of a
+  named goal) — and have the decider's every-turn output re-state the headline G-goal it
+  is serving and tag the current activity headline vs instrumental. An anchor the agent
+  must re-type each turn is far harder to drift past than one buried in a goals file read
+  only at bootstrap.
+- **Instrumental results can't redirect the headline.** Parallel to *claims are
+  scale-bound*: a finding from an instrumental experiment is evidence about a design
+  knob, not a license to redefine the problem. A weakness surfaced inside an ablation is
+  logged as a side-observation (a new hypothesis — possibly a fresh pre-reg or a
+  killed-register entry); it becomes the new objective only through an explicit, dated,
+  version-bumped plan amendment that ties it to a G-goal. The verdict on a
+  pre-registered experiment answers *its registered question* — wandering off it onto
+  whatever the run happened to surface is the named failure.
+- **Direction reviewer on verdict and amendment turns.** The decider routes its
+  highest-stakes, hard-to-reverse calls — claim-grade PASS, hypothesis kills, plan
+  amendments / REDIRECTs, salvage-scope adjudications — past a read-only direction
+  reviewer before the hand-off. Its one job is to attack goal-alignment the way the win
+  autopsy attacks a win: *does this verdict answer the pre-registered question and serve
+  its headline G-goal, or has the loop's center of gravity quietly shifted to a
+  sub-result?* Scope it to irreversible calls only — not routine APPROVE / REVISE / WAIT
+  turns — so it defends the failure mode without becoming the bureaucracy the rule budget
+  forbids. It cannot redirect anything; it flags, persists its finding, and the human
+  still decides.
 - **Conflict order**, written down: goals doc > plan > scientific validity > human
   preference > agent suggestion. The order arbitrates whose *proposal* wins; it is
   not a license to execute a plan discovered to be scientifically invalid — that
@@ -209,10 +258,12 @@ mechanically checkable — instead of a prose `Review: passed` line taken on tru
   compliance. Plan changes happen only via explicit, dated, version-bumped
   amendments — silent redirection is the named enemy.
 - **Periodic retro** (every N review turns or at phase boundaries) that checks
-  direction against goals, register health, debt accumulation, and — critically —
-  a cumulative-delta sanity check: do the per-experiment deltas reported since the
-  last retro sum to the actual movement against the baseline? This is the
-  program-level fabrication detector.
+  direction against goals — including an explicit *center-of-gravity* check: is the
+  headline G-goal still what the last N turns actually advanced, or did an ablation
+  capture the agenda? — plus register health, debt accumulation, and, critically, a
+  cumulative-delta sanity check: do the per-experiment deltas reported since the last
+  retro sum to the actual movement against the baseline? This is the program-level
+  fabrication detector.
 
 ### Rule budget — the system must stay small
 
@@ -234,10 +285,13 @@ amendment — never silent.
 
 Generate the system: a slim root instruction file (bootstrap ritual, invariants,
 ownership table, pointers), role files sized per Step 3, the goals doc seeded from
-the interview, the state files, `handoffs/` and `reviews/` directories, `gates/`
+the interview, the state files, `handoffs/` and `reviews/` directories, the hand-off
+carry command (the `/copy` slash command or skill from *State files*), `gates/`
 scripts for every mechanically checkable rule (pre-commitment tamper checks, hand-off
-field validation, staleness checks), hooks where the harness supports them, the
-reviewer subagent definition, and memory initialization. Gate scripts belong to the
+field validation — including the headline-vs-instrumental role tag on every experiment
+and the headline-G-goal line on every verdict — staleness checks), hooks where the
+harness supports them, the code-reviewer and direction-reviewer subagent definitions,
+and memory initialization. Gate scripts belong to the
 decider role in the ownership table: the executor never edits a gate to make a turn
 pass — weakening a gate is a directional change, exactly like rewriting a test. One
 commit per coherent unit, conventional commit messages. Where the project already had
@@ -250,7 +304,8 @@ working equivalents, adapt and keep their names — continuity beats uniformity.
 - Run every gate script; each must pass on the clean scaffold and demonstrably fail
   on a violation (test at least one).
 - Walk one simulated hand-off round-trip (executor → human → decider → human →
-  executor) and confirm the files capture it.
+  executor) and confirm the files capture it and the carry command surfaces the right
+  block — verbatim and copy-pasteable — in both directions.
 - Hand the human a summary: what was created, what each gate enforces, what is
   deliberately *not* enforced yet and which phase transition turns it on.
 
@@ -278,5 +333,9 @@ The system must improve itself as the project and the tooling evolve:
 - If the human asks to skip the human-in-the-loop gate for speed: the hand-carry is
   the control gate that catches what every automated layer misses. Offer to reduce
   *what* requires the gate (more pre-approved categories), not to remove it.
+- If the human asks to drop the headline anchor or the direction reviewer as overhead:
+  local-result capture is the drift that most often forces a manual course-correction,
+  so the check pays for itself. Offer to shorten the anchor to one line or narrow what
+  the reviewer fires on — never to remove the goal-alignment check entirely.
 - If an existing setup has a rule you'd prune but the human says it once saved them:
   keep it — their incident memory outranks your tidiness.
