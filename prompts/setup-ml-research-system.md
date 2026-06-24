@@ -1,6 +1,6 @@
 # Setup Prompt — Agentic ML Research Development System
 
-> **Prompt version: v3 (2026-06-24)** — bump on every amendment; cite the lesson or
+> **Prompt version: v4 (2026-06-24)** — bump on every amendment; cite the lesson or
 > incident that motivated it in the commit message.
 
 **How to use:** open an agent session (Claude Code or equivalent, strongest available
@@ -147,20 +147,23 @@ summarize the most recent kills in every hand-off); and **curated memory** (dist
 *patterns* — what worked, what didn't, under what conditions — written at phase
 boundaries by the decider role, not transcripts of events).
 
-**Hand-offs are state too — and symmetric.** Both roles write the block they hand the
-other to a durable `handoffs/` file, not just pasted into chat — the *same* mechanism
-in both directions, so neither role is "the one that emits a file" and the other "the
-one that emits chat text" (that asymmetry is a real source of human confusion). The
-human still hand-carries the block (timing and control unchanged); the file is the
-canonical record that survives session loss. Make carrying frictionless with a single
-**carry command** — implement it with whatever the harness offers (a `/copy` slash
-command or skill is the natural fit). Run in the source session, it: detects the
-current role mechanically, surfaces the hand-off written *for the other session* — the
-latest by default, or a short pick-list if several are live — as one clean copy-paste
-block, and, if the freshest in-chat hand-off is newer than the committed file (the
-role forgot to commit), says so and asks which to copy. The human pastes that block
-into the other session and never opens the `.md` by hand; the interaction is identical
-in both directions.
+**Hand-offs: separate the carry from the record — they are different problems**, and
+conflating them invites bespoke machinery the harness already obviates. *Carrying* the
+block into the other session is the harness's job, not yours: have each role emit its
+hand-off as a single fenced code block and let the human use the native code-block copy
+(the copy button on web/desktop UIs). That is symmetric for free — both roles emit a
+block, so neither is "the one that emits a file" while the other "emits chat text" (the
+asymmetry that actually confuses people). Do **not** build a custom copy command for
+this: a slash command cannot reach the system clipboard except by shelling to
+OS-specific tools (`pbcopy`/`xclip`/`clip.exe`) that fail on web and over SSH, so it
+either duplicates the native button or breaks — build one only where the harness has no
+native affordance (a bare terminal) and a portable clipboard tool exists, and probe
+first. *Durability* — surviving a crashed session — is the separate concern, and it is
+already carried by the verdict log (the decider's per-turn next-step) and the run-state
+file (the executor's latest results): make those entries rich enough that a fresh
+session recovers the pending hand-off from them alone. A parallel `handoffs/` file tree
+is justified only when they can't — then widen them or keep a lightweight handoff file;
+don't stand up a second source of truth by default.
 
 **Review evidence is state too.** Each reviewer's raw findings are persisted to a file
 keyed to what it reviewed — the code reviewer to the commit (e.g. `reviews/<sha>.md`),
@@ -285,13 +288,14 @@ amendment — never silent.
 
 Generate the system: a slim root instruction file (bootstrap ritual, invariants,
 ownership table, pointers), role files sized per Step 3, the goals doc seeded from
-the interview, the state files, `handoffs/` and `reviews/` directories, the hand-off
-carry command (the `/copy` slash command or skill from *State files*), `gates/`
+the interview, the state files, a `reviews/` directory (and a `handoffs/` directory
+only if you keep durable hand-off files per *State files*), `gates/`
 scripts for every mechanically checkable rule (pre-commitment tamper checks, hand-off
 field validation — including the headline-vs-instrumental role tag on every experiment
 and the headline-G-goal line on every verdict — staleness checks), hooks where the
-harness supports them, the code-reviewer and direction-reviewer subagent definitions,
-and memory initialization. Gate scripts belong to the
+harness supports them, the code-reviewer and direction-reviewer subagent definitions
+(committed in the project, not user-global, so a fresh clone or restarted session has
+the whole system from files alone), and memory initialization. Gate scripts belong to the
 decider role in the ownership table: the executor never edits a gate to make a turn
 pass — weakening a gate is a directional change, exactly like rewriting a test. One
 commit per coherent unit, conventional commit messages. Where the project already had
@@ -304,8 +308,8 @@ working equivalents, adapt and keep their names — continuity beats uniformity.
 - Run every gate script; each must pass on the clean scaffold and demonstrably fail
   on a violation (test at least one).
 - Walk one simulated hand-off round-trip (executor → human → decider → human →
-  executor) and confirm the files capture it and the carry command surfaces the right
-  block — verbatim and copy-pasteable — in both directions.
+  executor): confirm both directions emit a copy-pasteable fenced block, and that a
+  fresh session could recover the pending next-step from the durable records alone.
 - Hand the human a summary: what was created, what each gate enforces, what is
   deliberately *not* enforced yet and which phase transition turns it on.
 
