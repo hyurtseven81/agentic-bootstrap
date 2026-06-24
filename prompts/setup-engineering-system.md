@@ -1,6 +1,6 @@
 # Setup Prompt — Agentic Engineering Development System
 
-> **Prompt version: v3 (2026-06-24)** — bump on every amendment; cite the lesson or
+> **Prompt version: v4 (2026-06-24)** — bump on every amendment; cite the lesson or
 > incident that motivated it in the commit message.
 
 **How to use:** open an agent session (Claude Code or equivalent, strongest available
@@ -147,12 +147,14 @@ stores distilled *patterns* (what approach worked, what to avoid and why), not
 event transcripts.
 
 When the topology has a split (a planner/architect session feeding an implementer),
-the block each session hands the other is durable state too: commit it to a
-`handoffs/` file and carry it with a single command — a `/copy` slash command or skill
-— that surfaces the latest block for the other session as clean copy-paste text. Keep
-it symmetric in both directions, so neither session is "the one that emits a file" and
-the other "the one that emits chat text" — that asymmetry confuses the human carrying
-the hand-off.
+separate the *carry* from the *record*. Carry: have each session emit its hand-off as
+a fenced code block and use the harness's native code-block copy (the copy button on
+web/desktop) — symmetric in both directions, so neither session is "the one that emits
+a file" and the other chat text. Don't build a bespoke copy command — a slash command
+can't reach the clipboard except via OS-specific shell tools (`pbcopy`/`xclip`) that
+fail on web and over SSH; build one only where there's no native affordance. Record:
+the decision records and task ledger already hold durable state — add a `handoffs/`
+file only if they're too terse to recover the pending hand-off after a crash.
 
 ### Test strategy — shaped to the contract surface
 
@@ -215,8 +217,9 @@ decision-record directory seeded with the stack decisions already visible in the
 repo (mark them as inferred, ask the human to confirm), the task ledger, the specs
 directory, `gates/` scripts and hooks for everything mechanically checkable (test
 runner, lint/typecheck, contract-diff check, migration-safety check, destructive-
-command guard), CI wiring if the project ships, and the reviewer subagent
-definition. Changing or weakening a gate requires explicit human sign-off, exactly
+command guard), CI wiring if the project ships, and the reviewer subagent definition
+(committed in the project, not user-global, so a fresh clone has the whole system).
+Changing or weakening a gate requires explicit human sign-off, exactly
 like rewriting a test — never a side effect of making a task pass. One commit per
 coherent unit, conventional messages. Where the project already had working
 equivalents, adapt and keep their names.
