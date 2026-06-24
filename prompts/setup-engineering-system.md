@@ -1,6 +1,6 @@
 # Setup Prompt — Agentic Engineering Development System
 
-> **Prompt version: v2 (2026-06-10)** — bump on every amendment; cite the lesson or
+> **Prompt version: v3 (2026-06-24)** — bump on every amendment; cite the lesson or
 > incident that motivated it in the commit message.
 
 **How to use:** open an agent session (Claude Code or equivalent, strongest available
@@ -145,6 +145,14 @@ before being believed); **specs** for non-trivial features; a
 appended to when something actually bites. Memory, if the harness provides it,
 stores distilled *patterns* (what approach worked, what to avoid and why), not
 event transcripts.
+
+When the topology has a split (a planner/architect session feeding an implementer),
+the block each session hands the other is durable state too: commit it to a
+`handoffs/` file and carry it with a single command — a `/copy` slash command or skill
+— that surfaces the latest block for the other session as clean copy-paste text. Keep
+it symmetric in both directions, so neither session is "the one that emits a file" and
+the other "the one that emits chat text" — that asymmetry confuses the human carrying
+the hand-off.
 
 ### Test strategy — shaped to the contract surface
 
