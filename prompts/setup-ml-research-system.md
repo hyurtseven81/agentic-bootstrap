@@ -1,6 +1,6 @@
 # Setup Prompt — Agentic ML Research Development System
 
-> **Prompt version: v4 (2026-06-24)** — bump on every amendment; cite the lesson or
+> **Prompt version: v5 (2026-06-24)** — bump on every amendment; cite the lesson or
 > incident that motivated it in the commit message.
 
 **How to use:** open an agent session (Claude Code or equivalent, strongest available
@@ -135,9 +135,10 @@ ownership table, so sessions never clobber each other.
 
 ### State files — the minimum durable set
 
-Whatever you name them, the system needs durable homes for: **goals and locked
-decisions** (the single source of truth, wins all conflicts — including an explicit
-"decisions locked" vs "still open" split so settled questions don't get re-litigated);
+Whatever you name them, the system needs durable homes for: **goals** (the single
+source of truth for *what* we're solving — wins all conflicts — with an explicit
+"settled" vs "still open" split so settled questions don't get re-litigated; the
+*decisions* that settle them live in decision records (ADRs), not here);
 **live run state** (enough for a fresh session to recover mid-experiment: config,
 checkpoint path, launch SHA, dataset identity, status, with a staleness rule — if the
 file says "in progress" but hasn't been touched in 24h, query the compute platform
@@ -146,6 +147,34 @@ before believing it); **a verdict log** (append-only, one line per review turn);
 summarize the most recent kills in every hand-off); and **curated memory** (distilled
 *patterns* — what worked, what didn't, under what conditions — written at phase
 boundaries by the decider role, not transcripts of events).
+
+**Architecture decisions are state too — and they live outside the goals doc.**
+`problems.md` holds *problems*; the moment it accumulates *solutions* it becomes its own
+drift vector (a settled how-decision reopens as if it were the goal). Give every
+architecturally-significant, hard-to-reverse decision with live alternatives — model
+architecture, code architecture, data/eval-protocol, and significant *process* choices
+— its own append-only **decision record (ADR)**, one file per decision in an `adr/`
+directory:
+
+```
+# ADR-<NNNN>: <decision title>
+Status: proposed | accepted | superseded-by ADR-<NNNN> | deprecated   (<date>)
+Serves: <problem / G-goal this decides how to solve>
+Decision: <the choice made>
+Alternatives rejected: <option — why not>; <option — why not>
+Consequences: <what it commits us to / blast-radius>
+Reverses-if: <evidence or condition that would supersede this>
+Evidence: <pre-reg / verdict / report SHA or path, if empirical — else n/a>
+```
+
+Supersede with a new ADR that links back; never edit a decision in place (invariant 4).
+The decider owns ADRs; the executor *proposes* one in a hand-off (like curated memory).
+The goals doc, plan, and verdict log *reference* an ADR by id rather than restating it,
+so each decision has exactly one home — no double-recording. Threshold matters: an ADR
+is for a decision a future session would otherwise re-litigate or silently undo, not
+every config value (rule budget). An ADR reconstructed from history is marked
+`proposed — inferred` until the decider confirms it, so a guessed rationale is never
+asserted as fact (invariant 1).
 
 **Hand-offs: separate the carry from the record — they are different problems**, and
 conflating them invites bespoke machinery the harness already obviates. *Carrying* the
@@ -288,7 +317,9 @@ amendment — never silent.
 
 Generate the system: a slim root instruction file (bootstrap ritual, invariants,
 ownership table, pointers), role files sized per Step 3, the goals doc seeded from
-the interview, the state files, a `reviews/` directory (and a `handoffs/` directory
+the interview, the state files, the `adr/` directory seeded with the design decisions
+already visible in the repo or history (each marked inferred — confirm), a `reviews/`
+directory (and a `handoffs/` directory
 only if you keep durable hand-off files per *State files*), `gates/`
 scripts for every mechanically checkable rule (pre-commitment tamper checks, hand-off
 field validation — including the headline-vs-instrumental role tag on every experiment

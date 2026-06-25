@@ -1,6 +1,6 @@
 # Setup Prompt — Agentic Engineering Development System
 
-> **Prompt version: v4 (2026-06-24)** — bump on every amendment; cite the lesson or
+> **Prompt version: v5 (2026-06-24)** — bump on every amendment; cite the lesson or
 > incident that motivated it in the commit message.
 
 **How to use:** open an agent session (Claude Code or equivalent, strongest available
@@ -136,7 +136,10 @@ failing-then-passing test is provisional.
 
 Whatever you name them, the system needs: a **conventions file** (the slim root
 instruction file: stack, commands, style, bootstrap ritual, ownership table);
-**decision records** (append-only, dated, why + rejected alternatives); a **task
+**decision records / ADRs** (append-only, dated: the decision, why, rejected
+alternatives, status [accepted / superseded-by-#N], and what would reverse it — one
+file per architecturally-significant, hard-to-reverse choice, referenced from specs and
+the task ledger rather than restated); a **task
 ledger** (what's in flight, what's blocked, what's next — granular enough that a
 fresh session can resume mid-feature, with a staleness rule: an in-progress entry no
 session has touched recently is reconciled against reality — branch, diff, CI state —

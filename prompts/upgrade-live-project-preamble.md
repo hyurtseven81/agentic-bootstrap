@@ -1,6 +1,6 @@
 # Preamble — Applying a Setup Prompt to a LIVE Project
 
-> **Prompt version: v1 (2026-06-10)** — bump on every amendment; cite the lesson or
+> **Prompt version: v2 (2026-06-24)** — bump on every amendment; cite the lesson or
 > incident that motivated it in the commit message.
 
 **How to use:** when the target project is already operating — role files in active
@@ -34,7 +34,9 @@ Hard constraints for this upgrade:
 2. **Do not modify live state or evidence:** run-status content, review-log
    entries, sealed pre-registrations, reports, checkpoints — nor any code or
    config that produces reported numbers. Protocol files, role files, gates, and
-   docs only.
+   docs only. Decision records (ADRs) reconstructed from the project's visible history
+   are docs and may be seeded, but each is marked inferred and left for the decider to
+   confirm — never assert a guessed rationale as fact.
 3. **Rename nothing.** Keep every existing file name and convention — continuity
    beats uniformity.
 4. **History is sacred.** One commit per coherent change, `git mv` over
