@@ -89,6 +89,24 @@ answers. A typical sequence for a research project:
 Engineering projects follow the same shape with `setup-engineering-system.md`
 as the primary.
 
+### Applying to an established project
+
+The prompts distinguish two established states:
+
+- **Existing codebase, nothing running.** Paste the prompt directly. Its
+  reconnaissance audits whatever is there — code, history, any prior agentic
+  setup — and proposes the *keep / add / prune* upgrade for approval before
+  touching anything, keeping your existing names and conventions. This is also
+  how a sibling prompt joins a project the first one already set up.
+- **Live project** — protocol files in active use, possibly an expensive run in
+  flight. Prepend
+  [`upgrade-live-project-preamble.md`](prompts/upgrade-live-project-preamble.md)
+  (edit its bracketed facts first) in a fresh session. It overrides the setup
+  prompt where they conflict: audit-and-upgrade only, live state and evidence
+  untouchable, renames forbidden, new gates additive (a latent bug they expose
+  is reported, never self-adjudicated), refactors deferred until the in-flight
+  work closes.
+
 ## Design philosophy
 
 These prompts deliberately avoid strict, frozen rulebooks. Each one carries:
