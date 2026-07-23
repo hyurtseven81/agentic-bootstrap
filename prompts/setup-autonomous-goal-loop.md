@@ -1,6 +1,6 @@
 # Setup Prompt — Autonomous Goal-Loop Engineering System
 
-> **Prompt version: v1 (2026-07-23)** — bump on every amendment; cite the lesson or
+> **Prompt version: v2 (2026-07-23)** — bump on every amendment; cite the lesson or
 > incident that motivated it in the commit message.
 
 **How to use:** open an agent session (Claude Code or equivalent, strongest available
@@ -164,6 +164,37 @@ criterion is the problem.
 Companion commands: `/loop` (run iterations until a stop condition — the normal
 mode), `/step` (exactly one iteration, for supervised warm-up), `/status` (goal,
 criteria state, budget consumed, ledger tail).
+
+### Hybrid operation with the sibling systems
+
+When a project runs this system alongside the Lead/Scientist system of
+`setup-ml-research-system.md`, a research hypothesis ("architecture X beats
+baseline Y under condition Z") decomposes across the pair: the claim itself is
+pre-registered and adjudicated there, and only its autonomy-test-passing
+subgoals — reproduce the baseline within tolerance, implement X with the golden
+fixture green, push a pre-registered metric past a threshold on the frozen
+split — run here as `/goal` loops. Two rules keep the seam honest:
+
+- **A goal serving a claim says so.** The GOAL file names the pre-registration
+  it serves (e.g. a `Serves:` line with the pre-reg id or path), so the ledger
+  and any completion claim tie back to the question the loop is actually
+  serving.
+- **Loop outcomes are evidence, never verdicts.** `done` on a threshold goal
+  enters the research loop as an executor result subject to its win autopsy —
+  it does not by itself validate the claim. An escalation or exhausted budget
+  establishes "stalled under this budget," never "not achievable" — refuting a
+  hypothesis is a human-gated verdict under the research system's symmetric
+  scrutiny, owned by its decider role.
+
+The same seam exists with `setup-engineering-system.md`, where it fires more
+often — spec'd acceptance checks are usually mechanical ("suite green,"
+"endpoint per spec S with contract tests passing, no undeclared contract
+diff"). There the GOAL file names the spec it serves, that system's gates and
+tests play the frozen-harness role (never weakened or rewritten to make an
+iteration pass), and its human gates survive delegation: the completed loop's
+diff still goes through its review loop, the human still decides what merges,
+and spec changes, contract changes, and destructive actions end the loop and
+escalate rather than run unattended.
 
 ### The iteration protocol
 
