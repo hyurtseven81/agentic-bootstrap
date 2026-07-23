@@ -9,6 +9,7 @@ the target project — instead of copying a fixed boilerplate.
 | Prompt | For |
 |---|---|
 | [`prompts/setup-ml-research-system.md`](prompts/setup-ml-research-system.md) | Complex ML research — recsys, ranking, retrieval; expensive experiments, human-in-the-loop Lead/Scientist split, pre-registration, verdict discipline |
+| [`prompts/setup-autonomous-goal-loop.md`](prompts/setup-autonomous-goal-loop.md) | Autonomous goal loops — sibling of the ML-research prompt for goals whose success criteria are scripts exiting 0/1 against tamper-proof artifacts; `/goal` command, unattended Plan→Implement→Verify→Evaluate→Critique→Decide iterations, frozen eval harness, append-only ledger, mechanical budget caps, escalation triggers |
 | [`prompts/setup-engineering-system.md`](prompts/setup-engineering-system.md) | Standard product engineering — CMS, ERP, SaaS; backend / frontend / API / gRPC; spec-first, contract discipline, test gates |
 | [`prompts/setup-dev-machine.md`](prompts/setup-dev-machine.md) | Provisioning the dev machine itself — macOS / Linux / Windows / WSL2, fresh or partial; shell, tmux, Neovim/LazyVim, runtimes, ML CLI tooling; idempotent, proxy-aware, approval-gated |
 | [`prompts/setup-claude-code.md`](prompts/setup-claude-code.md) | Configuring the Claude Code harness itself — strongest-model + largest-context default, auto-memory, auto-accept posture with mechanical gates, subagents, skills, plugins, MCP; idempotent, approval-gated, self-evolving |
@@ -50,7 +51,7 @@ either failure.
 Every prompt carries a **Prompt version** header — bump it on every amendment and
 cite the motivating lesson or incident in the commit message. The repo applies its
 own gates-over-prose rule to itself: CI runs [`gates/run-all.sh`](gates/run-all.sh)
-on every PR — version headers present and bumped on any prompt change, the two
+on every PR — version headers present and bumped on any prompt change, the
 system prompts' section skeletons in structural parallel, internal links resolving,
 shellcheck clean. Run it locally before pushing. When a generated
 system learns a project-agnostic lesson (a new failure mode, a gate worth
