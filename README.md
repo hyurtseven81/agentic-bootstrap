@@ -15,16 +15,79 @@ the target project — instead of copying a fixed boilerplate.
 | [`prompts/setup-claude-code.md`](prompts/setup-claude-code.md) | Configuring the Claude Code harness itself — strongest-model + largest-context default, auto-memory, auto-accept posture with mechanical gates, subagents, skills, plugins, MCP; idempotent, approval-gated, self-evolving |
 | [`prompts/upgrade-live-project-preamble.md`](prompts/upgrade-live-project-preamble.md) | Companion preamble — prepend to a setup prompt when the target project is already **live** (runs in flight, current state files) to force audit-and-upgrade mode with explicit do-not-touch constraints |
 
+## Which prompt, when
+
+Pick by what you're setting up:
+
+- **The machine itself** — shell, tmux, editors, runtimes →
+  [`setup-dev-machine.md`](prompts/setup-dev-machine.md)
+- **The Claude Code harness itself** — models, memory, permissions, subagents →
+  [`setup-claude-code.md`](prompts/setup-claude-code.md)
+- **A software product** — success means tests green, contracts kept, features
+  demonstrated → [`setup-engineering-system.md`](prompts/setup-engineering-system.md)
+- **ML research** — success means a defensible claim from expensive experiments →
+  [`setup-ml-research-system.md`](prompts/setup-ml-research-system.md)
+- **Unattended goal-grinding** →
+  [`setup-autonomous-goal-loop.md`](prompts/setup-autonomous-goal-loop.md), but
+  only for goals passing its **autonomy test**: every success criterion
+  checkable by a script exiting 0/1 against artifacts the agent cannot corrupt.
+  "Metric ≥ threshold on the frozen eval split, tests green, reproducible"
+  passes; "architecture X beats baseline Y under condition Z" never does — that
+  is a research claim and belongs to the ML-research system.
+- **The project is already live** — runs in flight, current state files →
+  prepend [`upgrade-live-project-preamble.md`](prompts/upgrade-live-project-preamble.md)
+  to whichever prompt applies.
+
+The three system prompts **compose in one project**. The normal pairing is
+research or engineering as the primary, human-in-the-loop system, plus the goal
+loop installed alongside for the subgoals that pass the autonomy test
+(reproduce a baseline, make a suite green, push a pre-registered metric past a
+threshold). Each prompt's hybrid/delegation section defines the seam; the short
+version: loop outcomes are *evidence* the primary system adjudicates — `done`
+is not a validated claim, and an exhausted budget is "stalled", never "not
+achievable".
+
 ## Usage
+
+No need to clone this repo — every prompt is **self-contained**, and nothing it
+builds in your project references this repo's files. Sibling mentions inside a
+prompt (the research system pointing at the goal loop, say) are pointers for
+*you*, not files the agent reads: the sibling is installed by pasting that
+prompt into its own session in the same project, where its reconnaissance finds
+the existing system and integrates with it rather than replacing it.
 
 1. Open an agent session at the root of your project (empty **or** existing) — or,
    for the machine prompt, anywhere on the target machine.
-2. Paste the entire relevant prompt.
+2. Paste the entire relevant prompt (raw view → copy all). If the project is
+   live, prepend the upgrade preamble.
 3. Answer the short interview; review the proposed plan; let it build.
 
 On a **non-empty project** (or a partially set-up machine) the prompt audits what's
 already there and proposes a *keep / add / prune* upgrade — it adapts to your setup
 rather than imposing the template.
+
+### Starting a new project from scratch
+
+Don't pre-author `problems.md`, goals docs, or any other state files — the
+prompts generate them: reconnaissance reads whatever is in the folder, the
+interview asks for the rest, and the build step seeds the state files from your
+answers. A typical sequence for a research project:
+
+1. *(Optional)* Drop existing context into the empty folder — notes, a rough
+   README, papers, dataset pointers, prior code. Reconnaissance reads it and
+   the interview shrinks.
+2. Paste the primary prompt (`setup-ml-research-system.md`) and answer the
+   interview — this is where you state the hypothesis ("X beats Y under
+   condition Z"), headline metrics, compute platform, and current phase. The
+   system it builds then owns `problems.md`, the goals doc, ADRs, and the rest.
+3. Work through the system it built: pre-register the claim, build the frozen
+   harness, iterate with the human-in-the-loop protocol.
+4. When concrete subgoals pass the autonomy test and you want them ground
+   unattended, paste `setup-autonomous-goal-loop.md` into a new session at the
+   same root — it audits the existing setup and installs `/goal` alongside it.
+
+Engineering projects follow the same shape with `setup-engineering-system.md`
+as the primary.
 
 ## Design philosophy
 
