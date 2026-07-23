@@ -20,11 +20,13 @@ NOT govern sessions in this repo.
 - Every prompt has a `Prompt version: vN (date)` header — bump it on any
   amendment and cite the motivating lesson in the commit message.
 - `gates/run-all.sh` is this repo's own gate suite (version headers + bump-on-change,
-  structural parallel of the two system prompts, internal links, shellcheck). Run it
+  structural parallel of the system prompts, internal links, shellcheck). Run it
   before committing; CI runs the same script on every PR.
-- When editing the two system prompts, keep them in structural parallel where
-  their content overlaps (recon → interview → invariants → principles → build →
-  verify → evolution loop) so lessons can be backported across them easily.
+- When editing the system prompts (`setup-ml-research-system.md`,
+  `setup-engineering-system.md`, `setup-autonomous-goal-loop.md`), keep them in
+  structural parallel where their content overlaps (recon → interview →
+  invariants → principles → build → verify → evolution loop) so lessons can be
+  backported across them easily.
 - `reference/legacy-strict-template/` is frozen prior art — don't extend it;
   backport lessons into the prompts instead.
 - Conventional commits (`feat(prompts):`, `docs(readme):`, …).
