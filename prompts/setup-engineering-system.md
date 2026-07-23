@@ -1,6 +1,6 @@
 # Setup Prompt — Agentic Engineering Development System
 
-> **Prompt version: v5 (2026-06-24)** — bump on every amendment; cite the lesson or
+> **Prompt version: v6 (2026-07-23)** — bump on every amendment; cite the lesson or
 > incident that motivated it in the commit message.
 
 **How to use:** open an agent session (Claude Code or equivalent, strongest available
@@ -131,6 +131,28 @@ small and ship in thin vertical slices (one endpoint end-to-end beats three laye
 of scaffolding). The spec lives in the repo and the implementation cites it. For
 bug fixes: reproduce first, fix second, regression-test third — a fix without a
 failing-then-passing test is provisional.
+
+### Delegating tasks to an autonomous goal loop
+
+This prompt has a sibling, `setup-autonomous-goal-loop.md`, for goals whose
+every success criterion is checkable by a script exiting 0/1 against artifacts
+the agent cannot corrupt (its "autonomy test"). The sibling is a separate,
+self-contained prompt from the same collection this one came from — the human
+installs it by pasting it into its own session at this project root, where its
+reconnaissance audits this system and integrates with it; never assume its
+file is present here. Engineering work passes that
+test more often than research does — "the failing suite is green," "endpoint
+implemented per spec S: contract tests pass, no undeclared contract diff,
+lint/types green" — and where both systems are installed, such tasks may run
+there as unattended loops instead of attended sessions. The seam rules: the
+GOAL file names the spec it serves, so the loop optimizes the agreed acceptance
+checks rather than a proxy of its own choosing; the gates and tests play the
+frozen-harness role — the loop never weakens a gate or rewrites a test to make
+an iteration pass, both directional changes requiring explicit human sign-off;
+a completed loop's diff still enters the review loop and the human still
+decides what merges; and the human gates survive delegation — spec agreement,
+contract changes, and destructive actions (invariants 2–3) stay outside the
+loop, so a goal that turns out to need one mid-loop escalates instead.
 
 ### The durable state set
 

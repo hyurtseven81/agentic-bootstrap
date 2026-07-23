@@ -1,6 +1,6 @@
 # Setup Prompt — Agentic ML Research Development System
 
-> **Prompt version: v5 (2026-06-24)** — bump on every amendment; cite the lesson or
+> **Prompt version: v6 (2026-07-23)** — bump on every amendment; cite the lesson or
 > incident that motivated it in the commit message.
 
 **How to use:** open an agent session (Claude Code or equivalent, strongest available
@@ -132,6 +132,26 @@ split when claims start carrying weight. Whatever topology you choose: each role
 identity is determined by something mechanical (launch directory, explicit file),
 never inferred from conversation; and one writer per file, with an explicit
 ownership table, so sessions never clobber each other.
+
+### Delegating subgoals to an autonomous goal loop
+
+This prompt has a sibling, `setup-autonomous-goal-loop.md`, for goals whose
+every success criterion is checkable by a script exiting 0/1 against artifacts
+the agent cannot corrupt (its "autonomy test"). The sibling is a separate,
+self-contained prompt from the same collection this one came from — the human
+installs it by pasting it into its own session at this project root, where its
+reconnaissance audits this system and integrates with it; never assume its
+file is present here. Where both systems are installed, the executor's mechanically verifiable subgoals — reproduce the
+baseline within tolerance, golden fixture green at the launch SHA, push a
+pre-registered metric past a threshold on the frozen split — may run there as
+unattended loops instead of hand-carried turns. This delegates labor, not
+judgment: each such goal names the pre-registration it serves; a completed
+loop re-enters this system as an executor result subject to the win autopsy;
+and a loop that stalled or exhausted its budget has established "stalled under
+this budget," never "not achievable" — kills and refutations are decider
+verdicts under symmetric scrutiny (invariant 2). The research claim itself
+never runs unattended: autonomous loops optimize proxies, and research
+conclusions are the easiest proxies to game.
 
 ### State files — the minimum durable set
 
