@@ -136,7 +136,11 @@ failing-then-passing test is provisional.
 
 This prompt has a sibling, `setup-autonomous-goal-loop.md`, for goals whose
 every success criterion is checkable by a script exiting 0/1 against artifacts
-the agent cannot corrupt (its "autonomy test"). Engineering work passes that
+the agent cannot corrupt (its "autonomy test"). The sibling is a separate,
+self-contained prompt from the same collection this one came from — the human
+installs it by pasting it into its own session at this project root, where its
+reconnaissance audits this system and integrates with it; never assume its
+file is present here. Engineering work passes that
 test more often than research does — "the failing suite is green," "endpoint
 implemented per spec S: contract tests pass, no undeclared contract diff,
 lint/types green" — and where both systems are installed, such tasks may run

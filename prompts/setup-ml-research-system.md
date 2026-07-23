@@ -137,8 +137,11 @@ ownership table, so sessions never clobber each other.
 
 This prompt has a sibling, `setup-autonomous-goal-loop.md`, for goals whose
 every success criterion is checkable by a script exiting 0/1 against artifacts
-the agent cannot corrupt (its "autonomy test"). Where both systems are
-installed, the executor's mechanically verifiable subgoals — reproduce the
+the agent cannot corrupt (its "autonomy test"). The sibling is a separate,
+self-contained prompt from the same collection this one came from — the human
+installs it by pasting it into its own session at this project root, where its
+reconnaissance audits this system and integrates with it; never assume its
+file is present here. Where both systems are installed, the executor's mechanically verifiable subgoals — reproduce the
 baseline within tolerance, golden fixture green at the launch SHA, push a
 pre-registered metric past a threshold on the frozen split — may run there as
 unattended loops instead of hand-carried turns. This delegates labor, not

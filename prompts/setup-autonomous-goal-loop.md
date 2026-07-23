@@ -196,6 +196,13 @@ diff still goes through its review loop, the human still decides what merges,
 and spec changes, contract changes, and destructive actions end the loop and
 escalate rather than run unattended.
 
+Sibling references are pointers for the human, not files to read: each sibling
+is a separate, self-contained setup prompt from the same collection this one
+came from, installed by pasting it into its own session at this project root —
+whichever prompt runs second finds the first's system during reconnaissance and
+integrates with it (audit, don't bulldoze). Never assume a sibling's file is
+present in the project.
+
 ### The iteration protocol
 
 Each iteration, in order — a checklist the ledger entry mirrors:
