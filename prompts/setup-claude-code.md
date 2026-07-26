@@ -1,6 +1,6 @@
 # Setup Prompt — Claude Code Harness Configuration
 
-> **Prompt version: v3 (2026-06-10)** — bump on every amendment; cite the lesson or
+> **Prompt version: v4 (2026-07-26)** — bump on every amendment; cite the lesson or
 > incident that motivated it in the commit message. Phase A re-evaluates this file
 > every run and proposes amendments when stale; after approval, backport them to
 > the canonical copy in the prompts repo.
@@ -16,9 +16,9 @@ Scope: the **agent harness itself** — model + context defaults, auto-memory,
 permissions, hooks, sandbox, subagents, skills, plugins, MCP servers — at user
 scope (`~/.claude/`), with project-scope conventions documented, never imposed.
 Companions: `setup-dev-machine.md` provisions the OS/toolchain underneath; the
-two system prompts (`setup-ml-research-system.md`, `setup-engineering-system.md`)
-build per-project process on top. A project-level concern discovered here gets
-noted for those prompts, not configured globally.
+three system prompts (`setup-ml-research-system.md`, `setup-engineering-system.md`,
+`setup-autonomous-goal-loop.md`) build per-project process on top. A project-level
+concern discovered here gets noted for those prompts, not configured globally.
 
 ## Source of truth
 
@@ -206,9 +206,9 @@ paragraph asking for care; every gate cites its failure mode; the set stays smal
   under `~/.claude/agents/` — read-only tools, strongest model, an explicit
   "never edits, never runs jobs" charter, frontmatter per the current agent
   format. Projects built by the system prompts generate their own tailored
-  reviewers; the global one is the floor for everything else. (Projects built
-  from `setup-ml-research-system.md` expect the global name
-  `scientific-code-reviewer` — ask me before creating or renaming under it.)
+  reviewers; the global one is the floor for everything else. (A user-global
+  reviewer may already exist under a name of mine — e.g. the legacy
+  `scientific-code-reviewer`; keep the name and ask before renaming.)
 - **Skills:** the SPEC's standing skills plus the interview's repeated workflows —
   nothing speculative. Interview-derived skills that never fire are pruned at
   re-runs; standing skills are SPEC-fixed — report disuse, never prune them.
@@ -218,9 +218,13 @@ paragraph asking for care; every gate cites its failure mode; the set stays smal
   discoverability — it is UI-only, not parsing), each with a concrete trigger
   description.
 - **Reconcile existing commands — never duplicate, never bulldoze.** Inventory
-  every existing custom command and skill, including any legacy commands
-  directory the installed version still honors (at authoring time
-  `.claude/commands/*.md` and its user-scope equivalent still work, and a
+  every existing custom command and skill — personal skills, legacy commands,
+  plugin-shipped skills, and the harness's own **bundled** skills and built-in
+  commands, which is the layer that actually collides: plugin skills are
+  namespaced and cannot conflict, while a same-named personal or project skill
+  silently overrides a bundled one, and a built-in command may win outright. Include
+  any legacy commands directory the installed version still honors (at authoring
+  time `.claude/commands/*.md` and its user-scope equivalent still work, and a
   same-named skill silently takes precedence — the shadowing trap). For each one
   that a SPEC standing skill or interview workflow supersedes: keep its NAME and
   invocation habits, port its content into the current skill format upgraded to
@@ -263,9 +267,10 @@ report.
   check — real failover can't be live-tested); agents, skills, and plugins are
   listed and loadable; each SPEC standing skill resolves under its final name as
   recorded in the run report's migration entry, with exactly one implementation
-  answering that name across personal skills, legacy commands, and
-  plugin-shipped skills; the deep-research skill body contains the current
-  orchestration trigger (or invokes the wrapped official capability); every MCP
+  answering that name across personal skills, legacy commands, plugin-shipped
+  skills, and the harness's bundled skills and built-in commands (record which
+  native, if any, a kept name shadows); the deep-research skill body contains the
+  current orchestration trigger (or defers to the official capability); every MCP
   server connects.
 - EMIT A DOCTOR SCRIPT: every non-interactive check above goes into
   `~/.devsetup/verify-claude-code.sh` so harness health is re-checkable without
@@ -314,7 +319,9 @@ be re-verified at run time.)
   - `/deep-research <question>` — multi-source research: fan-out searches,
     adversarial verification of claims against independent sources, synthesis
     with citations. If the installed version ships an official deep-research
-    capability, prefer or wrap it rather than reimplementing. When
+    capability, prefer it — a same-named personal skill *overrides* the bundled
+    one rather than wrapping it, so keeping my name means the run report records
+    which bundled capability it shadows and why the local version is better. When
     self-authoring, the skill runs under the harness's workflow orchestration —
     at authoring time skill frontmatter CANNOT set ultracode (valid efforts stop
     at `max`); the skill BODY carries the `ultracode` keyword and orchestration
