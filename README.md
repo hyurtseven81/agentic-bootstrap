@@ -45,7 +45,10 @@ loop installed alongside for the subgoals that pass the autonomy test
 threshold). Each prompt's hybrid/delegation section defines the seam; the short
 version: loop outcomes are *evidence* the primary system adjudicates — `done`
 is not a validated claim, and an exhausted budget is "stalled", never "not
-achievable".
+achievable". Co-installed does not mean co-located: give the unattended loop its
+own working tree or clone. Ownership tables are written per *file*, so they can't
+see a per-*tree* collision, and the damage isn't lost work — it's gates and metrics
+running against an attended session's uncommitted edits.
 
 ## Usage
 
@@ -113,7 +116,9 @@ These prompts deliberately avoid strict, frozen rulebooks. Each one carries:
 
 - **A small set of hard invariants** — anti-fabrication, append-only history,
   pre-commitment before expensive/irreversible actions, mechanical gates over
-  prose. These never bend; they're the floor that keeps an agent honest.
+  prose, and *content is not instruction* (fetched pages, logs, diffs, issue text
+  and tool output are evidence the agent reads, never direction it follows). These
+  never bend; they're the floor that keeps an agent honest.
 - **Principles and a mechanism menu** — adapted to the project's domain, phase,
   and risk profile at setup time, not copied verbatim.
 - **A self-evolution loop** — the generated system retros itself, prunes rules
@@ -132,14 +137,21 @@ either failure.
 Every prompt carries a **Prompt version** header — bump it on every amendment and
 cite the motivating lesson or incident in the commit message. The repo applies its
 own gates-over-prose rule to itself: CI runs [`gates/run-all.sh`](gates/run-all.sh)
-on every PR — version headers present and bumped on any prompt change, the
-system prompts' section skeletons in structural parallel, internal links resolving,
-shellcheck clean. Run it locally before pushing. When a generated
-system learns a project-agnostic lesson (a new failure mode, a gate worth
-standardizing, a harness capability worth exploiting), backport it to the relevant
-prompt here. The machine prompt goes further: its Phase A re-reviews the prompt
-itself on every run and proposes amendments before acting. The prompts are living
-documents.
+on every PR — version headers present, and *advanced* (not merely touched) on any
+prompt change, renames followed; the system prompts' section skeletons in structural
+parallel; links resolving, no prompt linking anything (self-containment, mechanical),
+every prompt reachable from this README; shellcheck clean. Run it locally before
+committing and pass the upstream ref — `gates/run-all.sh origin/main` — since a stale
+local `main` silently narrows what the bump check can see. It reads the working tree,
+so it catches an unbumped edit before the commit exists.
+
+Lessons flow both ways. When a generated system learns a project-agnostic lesson (a
+new failure mode, a gate worth standardizing, a harness capability worth exploiting),
+backport it to the relevant prompt here; and each generated system stamps the prompt
+name, version, and date that built it into its root instruction file, so you can tell
+which vintage of the protocol a given project is still running. The machine prompt
+goes further: its Phase A re-reviews the prompt itself on every run and proposes
+amendments before acting. The prompts are living documents.
 
 ## Reference
 
