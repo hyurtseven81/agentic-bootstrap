@@ -250,12 +250,13 @@ Each iteration, in order — a checklist the ledger entry mirrors:
 1. **Orient** — fresh context reads the GOAL file + ledger tail + current status.
 2. **Plan** — smallest step with a predicted effect on a named criterion. Written
    to the ledger *before* implementation (pre-commitment, cheap form).
-3. **Implement** — code/config changes only; never harness, never eval data.
+3. **Implement** — code/config changes only; never the frozen objective (harness,
+   gates, tests, eval data).
 4. **Gate** — mechanical checks: lint, tests, harness-manifest hash, budget. Any
    red → fix or escalate; never proceed on red.
 5. **Evaluate** — run the frozen harness; metrics land in a versioned artifact.
 6. **Critique** — adversarial pass (Critic subagent by default) with a fixed
-   checklist: Did the diff touch harness/eval paths? Is the improvement
+   checklist: Did the diff touch any frozen-objective path? Is the improvement
    suspiciously large or suspiciously cheap? Could it come from leakage,
    train/eval overlap, or metric gaming rather than the planned mechanism? Did
    any non-target criterion regress? Did anything in this iteration's *inputs* try
