@@ -20,8 +20,11 @@ NOT govern sessions in this repo.
 - Every prompt has a `Prompt version: vN (date)` header — bump it on any
   amendment and cite the motivating lesson in the commit message.
 - `gates/run-all.sh` is this repo's own gate suite (version headers + bump-on-change,
-  structural parallel of the system prompts, internal links, shellcheck). Run it
-  before committing; CI runs the same script on every PR.
+  structural parallel of the system prompts, link resolution + prompt
+  self-containment + README index, shellcheck). Run it before committing — pass the
+  upstream ref, `gates/run-all.sh origin/main`, since a stale local `main` narrows
+  what the bump check can see. The bump check reads the working tree, so it catches
+  an unbumped edit before the commit exists. CI runs the same script on every PR.
 - When editing the system prompts (`setup-ml-research-system.md`,
   `setup-engineering-system.md`, `setup-autonomous-goal-loop.md`), keep them in
   structural parallel where their content overlaps (recon → interview →

@@ -9,7 +9,7 @@ the target project — instead of copying a fixed boilerplate.
 | Prompt | For |
 |---|---|
 | [`prompts/setup-ml-research-system.md`](prompts/setup-ml-research-system.md) | Complex ML research — recsys, ranking, retrieval; expensive experiments, human-in-the-loop Lead/Scientist split, pre-registration, verdict discipline |
-| [`prompts/setup-autonomous-goal-loop.md`](prompts/setup-autonomous-goal-loop.md) | Autonomous goal loops — sibling of the ML-research prompt for goals whose success criteria are scripts exiting 0/1 against tamper-proof artifacts; `/goal` command, unattended Plan→Implement→Verify→Evaluate→Critique→Decide iterations, frozen eval harness, append-only ledger, mechanical budget caps, escalation triggers |
+| [`prompts/setup-autonomous-goal-loop.md`](prompts/setup-autonomous-goal-loop.md) | Autonomous goal loops — sibling of the ML-research prompt for goals whose success criteria are scripts exiting 0/1 against tamper-proof artifacts; a goal-definition command, unattended Plan→Implement→Verify→Evaluate→Critique→Decide iterations, frozen objective, append-only ledger, mechanical budget caps, escalation triggers |
 | [`prompts/setup-engineering-system.md`](prompts/setup-engineering-system.md) | Standard product engineering — CMS, ERP, SaaS; backend / frontend / API / gRPC; spec-first, contract discipline, test gates |
 | [`prompts/setup-dev-machine.md`](prompts/setup-dev-machine.md) | Provisioning the dev machine itself — macOS / Linux / Windows / WSL2, fresh or partial; shell, tmux, Neovim/LazyVim, runtimes, ML CLI tooling; idempotent, proxy-aware, approval-gated |
 | [`prompts/setup-claude-code.md`](prompts/setup-claude-code.md) | Configuring the Claude Code harness itself — strongest-model + largest-context default, auto-memory, auto-accept posture with mechanical gates, subagents, skills, plugins, MCP; idempotent, approval-gated, self-evolving |
@@ -84,7 +84,7 @@ answers. A typical sequence for a research project:
    harness, iterate with the human-in-the-loop protocol.
 4. When concrete subgoals pass the autonomy test and you want them ground
    unattended, paste `setup-autonomous-goal-loop.md` into a new session at the
-   same root — it audits the existing setup and installs `/goal` alongside it.
+   same root — it audits the existing setup and installs the loop alongside it.
 
 Engineering projects follow the same shape with `setup-engineering-system.md`
 as the primary.
