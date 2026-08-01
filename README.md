@@ -10,6 +10,7 @@ the target project — instead of copying a fixed boilerplate.
 |---|---|
 | [`prompts/setup-ml-research-system.md`](prompts/setup-ml-research-system.md) | Complex ML research — recsys, ranking, retrieval; expensive experiments, human-in-the-loop Lead/Scientist split, pre-registration, verdict discipline |
 | [`prompts/setup-autonomous-goal-loop.md`](prompts/setup-autonomous-goal-loop.md) | Autonomous goal loops — sibling of the ML-research prompt for goals whose success criteria are scripts exiting 0/1 against tamper-proof artifacts; a goal-definition command, unattended Plan→Implement→Verify→Evaluate→Critique→Decide iterations, frozen objective, append-only ledger, mechanical budget caps, escalation triggers |
+| [`prompts/setup-autonomous-research-campaign.md`](prompts/setup-autonomous-research-campaign.md) | Autonomous research campaigns — you write a brief (question, dataset, methodology space, reference papers, resource ceiling) and the system runs unattended to a positive result or an established dead end; subagent cast (implementer, code reviewer, literature and industry-practice scouts, critic, adjudicator), sequestered confirmation split, stuck ladder instead of stopping, exhaustion burden on failure |
 | [`prompts/setup-engineering-system.md`](prompts/setup-engineering-system.md) | Standard product engineering — CMS, ERP, SaaS; backend / frontend / API / gRPC; spec-first, contract discipline, test gates |
 | [`prompts/setup-dev-machine.md`](prompts/setup-dev-machine.md) | Provisioning the dev machine itself — macOS / Linux / Windows / WSL2, fresh or partial; shell, tmux, Neovim/LazyVim, runtimes, ML CLI tooling; idempotent, proxy-aware, approval-gated |
 | [`prompts/setup-claude-code.md`](prompts/setup-claude-code.md) | Configuring the Claude Code harness itself — strongest-model + largest-context default, auto-memory, auto-accept posture with mechanical gates, subagents, skills, plugins, MCP; idempotent, approval-gated, self-evolving |
@@ -27,6 +28,15 @@ Pick by what you're setting up:
   demonstrated → [`setup-engineering-system.md`](prompts/setup-engineering-system.md)
 - **ML research** — success means a defensible claim from expensive experiments →
   [`setup-ml-research-system.md`](prompts/setup-ml-research-system.md)
+- **A research question ground unattended** — you have a brief and a methodology
+  space, and what limits you is the *number of hand-carried turns* rather than the
+  difficulty of the science →
+  [`setup-autonomous-research-campaign.md`](prompts/setup-autonomous-research-campaign.md).
+  It runs the claim autonomously, which the other two prompts refuse, and pays for
+  it: the burden of proof on *failure* is higher than on success, the confirmation
+  split is sequestered from the search loop, and the terminal verdict is adjudicated
+  by a context that did not run the experiments. Its output is a defended draft
+  conclusion — one human turn per campaign — not a validated claim.
 - **Unattended goal-grinding** →
   [`setup-autonomous-goal-loop.md`](prompts/setup-autonomous-goal-loop.md), but
   only for goals passing its **autonomy test**: every success criterion
@@ -38,13 +48,15 @@ Pick by what you're setting up:
   prepend [`upgrade-live-project-preamble.md`](prompts/upgrade-live-project-preamble.md)
   to whichever prompt applies.
 
-The three system prompts **compose in one project**. The normal pairing is
+The four system prompts **compose in one project**. The normal pairing is
 research or engineering as the primary, human-in-the-loop system, plus the goal
 loop installed alongside for the subgoals that pass the autonomy test
 (reproduce a baseline, make a suite green, push a pre-registered metric past a
-threshold). Each prompt's hybrid/delegation section defines the seam; the short
-version: loop outcomes are *evidence* the primary system adjudicates — `done`
-is not a validated claim, and an exhausted budget is "stalled", never "not
+threshold), and the research campaign for a whole question you want ground
+overnight. Each prompt's hybrid/delegation section defines the seam; the short
+version: unattended outcomes are *evidence* the primary system adjudicates — `done`
+is not a validated claim, a campaign's terminal verdict is a defended draft, and an
+exhausted budget is "stalled", never "not
 achievable". Co-installed does not mean co-located: give the unattended loop its
 own working tree or clone. Ownership tables are written per *file*, so they can't
 see a per-*tree* collision, and the damage isn't lost work — it's gates and metrics
