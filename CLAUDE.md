@@ -26,7 +26,8 @@ NOT govern sessions in this repo.
   what the bump check can see. The bump check reads the working tree, so it catches
   an unbumped edit before the commit exists. CI runs the same script on every PR.
 - When editing the system prompts (`setup-ml-research-system.md`,
-  `setup-engineering-system.md`, `setup-autonomous-goal-loop.md`), keep them in
+  `setup-engineering-system.md`, `setup-autonomous-goal-loop.md`,
+  `setup-autonomous-research-campaign.md`), keep them in
   structural parallel where their content overlaps (recon → interview →
   invariants → principles → build → verify → evolution loop) so lessons can be
   backported across them easily.

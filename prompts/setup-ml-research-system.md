@@ -1,6 +1,6 @@
 # Setup Prompt — Agentic ML Research Development System
 
-> **Prompt version: v7 (2026-07-26)** — bump on every amendment; cite the lesson or
+> **Prompt version: v8 (2026-08-01)** — bump on every amendment; cite the lesson or
 > incident that motivated it in the commit message.
 
 **How to use:** open an agent session (Claude Code or equivalent, strongest available
@@ -158,6 +158,19 @@ this budget," never "not achievable" — kills and refutations are decider
 verdicts under symmetric scrutiny (invariant 2). The research claim itself
 never runs unattended: autonomous loops optimize proxies, and research
 conclusions are the easiest proxies to game.
+
+There is a third sibling, `setup-autonomous-research-campaign.md`, for the case
+this section does *not* cover: the human wants a whole research question — brief,
+methodology space, literature, resource ceiling — pursued unattended to a positive
+result or an established dead end, rather than hand-carrying every experiment turn.
+It runs the claim autonomously anyway, which this prompt otherwise refuses, and pays
+for it structurally: an evidentiary burden on *failure* that exceeds the burden on
+success, an evaluation split sequestered from the search loop, and a terminal verdict
+adjudicated by a context that did not run the experiments. Its output arrives here as
+a defended draft conclusion — an executor result under invariant 2's symmetric
+scrutiny, one human turn per campaign instead of one per experiment — never as a
+validated claim. Reach for it when the *volume of hand-carried turns*, not the
+difficulty of the science, is what is limiting the project.
 
 ### State files — the minimum durable set
 
@@ -401,7 +414,13 @@ The system must improve itself as the project and the tooling evolve:
   shrink the mechanism set, never the invariant set.
 - If the human asks to skip the human-in-the-loop gate for speed: the hand-carry is
   the control gate that catches what every automated layer misses. Offer to reduce
-  *what* requires the gate (more pre-approved categories), not to remove it.
+  *what* requires the gate (more pre-approved categories), not to remove it. But
+  separate the two things the gate is doing — *transport* (moving a block between
+  sessions) and *judgment* (deciding what it means). Only the second earns a human;
+  automate the first with whatever the harness offers. If after that the turn count
+  still scales with the number of experiments rather than the number of claims, the
+  honest answer is not a thinner gate here but the campaign sibling above, which
+  removes the human from the inner loop and pays the structural price for it.
 - If the human asks to drop the headline anchor or the direction reviewer as overhead:
   local-result capture is the drift that most often forces a manual course-correction,
   so the check pays for itself. Offer to shorten the anchor to one line or narrow what

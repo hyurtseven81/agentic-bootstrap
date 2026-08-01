@@ -1,6 +1,6 @@
 # Setup Prompt — Autonomous Goal-Loop Engineering System
 
-> **Prompt version: v3 (2026-07-26)** — bump on every amendment; cite the lesson or
+> **Prompt version: v4 (2026-08-01)** — bump on every amendment; cite the lesson or
 > incident that motivated it in the commit message.
 
 **How to use:** open an agent session (Claude Code or equivalent, strongest available
@@ -37,6 +37,16 @@ is a research claim ("A beats B and we understand why", "this effect is real"),
 route that goal to the Lead/Scientist system of `setup-ml-research-system.md` —
 autonomous loops optimize proxies, and research conclusions are the easiest proxies
 to game.
+
+Failing the autonomy test is not the same as needing a human turn per experiment.
+Where the human wants a whole research question pursued unattended — a brief in, a
+positive result or an established dead end out — the third sibling
+`setup-autonomous-research-campaign.md` does exactly that, and buys the right to by
+paying structurally: an evidentiary burden on *failure* higher than the one on
+success, an evaluation split sequestered from the search loop so that hundreds of
+unattended selections cannot quietly become the result, and a terminal verdict
+adjudicated by a context that did not run the experiments. Route there rather than
+weakening this prompt's autonomy test to admit a claim it was written to exclude.
 
 A goal like "risk–coverage AUGRC on the frozen eval split improves ≥X% over the
 committed baseline, harness hash unchanged, tests green, run reproducible from a
@@ -335,9 +345,12 @@ already had working equivalents, adapt and keep their names.
 ## Pushbacks you are expected to make
 
 - If the human wants a research-claim goal run autonomously ("just let it find the
-  best model overnight"): apply the autonomy test out loud and refuse. Offer the
-  split instead — the mechanically verifiable subgoal runs here, the claim goes to
-  the Lead/Scientist system.
+  best model overnight"): apply the autonomy test out loud and refuse *for this
+  system*. Offer the split — the mechanically verifiable subgoal runs here, the claim
+  goes to the Lead/Scientist system — and, when what they actually want is the whole
+  question ground unattended, name the campaign sibling rather than leaving them with
+  only the option they already rejected. Refusing the goal is correct; refusing the
+  need is not.
 - If the human asks to let the loop "just quickly fix" the harness mid-goal: that
   is one of the two human gates, because the harness is the objective function
   (the other is the GOAL file, which is the objective). Offer to
