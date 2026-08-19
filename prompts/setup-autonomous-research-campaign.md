@@ -1,6 +1,6 @@
 # Setup Prompt — Autonomous Research Campaign System
 
-> **Prompt version: v1 (2026-08-01)** — bump on every amendment; cite the lesson or
+> **Prompt version: v2 (2026-08-19)** — bump on every amendment; cite the lesson or
 > incident that motivated it in the commit message.
 
 **How to use:** open an agent session (Claude Code or equivalent, strongest available
@@ -137,14 +137,20 @@ line. Keep the list short — its power is that there are few of them.
 
 1. **Anti-fabrication.** Every number in the campaign log, the leaderboard, or a
    terminal verdict traces to a harness-produced artifact (path + hash). No number
-   appears in prose that does not exist in an artifact.
+   appears in prose that does not exist in an artifact. Tables and figures in any
+   report are *generated* by a script reading those artifacts, never typed —
+   fabrication concentrates in the secondary ablation and analysis tables nobody
+   re-derives, not in the headline number everyone checks.
 2. **Frozen objective, sequestered confirmation split.** The evaluation harness and
    its data are hash-locked at campaign start and re-checked every iteration; only
    they produce the numbers a verdict cites. The search loop reads the *search* split
    only. The **confirmation split is sequestered** — read exclusively by the harness
    at promotion and terminal checks, never by any agent, enforced by the strongest
    mechanism the harness offers (tool-permission exclusion, directory isolation, IAM
-   on an object-store prefix). Every touch of it is logged and counted against a
+   on an object-store prefix). The hash lock and the read denial are locks on two
+   *different* vectors and neither substitutes for the other: the lock stops the
+   objective being edited until it passes, the denial stops held-out data reaching
+   training. Install both. Every touch of the split is logged and counted against a
    declared budget, because the count *is* the multiple-comparisons exposure. Changing
    the harness or the splits ends the campaign and requires human approval.
 3. **Append-only campaign log.** One entry per experiment: timestamp, the
@@ -238,7 +244,7 @@ branch of the space, metric, cost, status, one-line description). The leaderboar
 what the human actually reads in the morning; make it complete enough to be read
 alone.
 
-Two guards on the pattern, both absent from the naive version:
+Three guards on the pattern, all absent from the naive version:
 
 - Keep/discard runs on the **search split only**. The confirmation split never
   participates in selection — the moment it does, it stops being a check on
@@ -246,6 +252,15 @@ Two guards on the pattern, both absent from the naive version:
 - Log the **selection count** and treat a champion's margin as provisional in
   proportion to it. A 0.3% win chosen from 200 attempts is a different claim from a
   0.3% win chosen from 5.
+- **Search the baseline with the budget the challengers get.** A decade of
+  recommender-systems reproducibility work keeps finding tuned classical methods
+  matching or beating the neural ones published as beating them, and a campaign that
+  searches the challenger hundreds of times and the baseline once manufactures that
+  illusion overnight — cleanly, with every gate green, because the arms were simply
+  not comparably tuned. Record the search budget spent per arm on the leaderboard; a
+  win over an under-searched baseline is a candidate, never a result. This is the
+  mirror of invariant 5: the dead-end burden stops a cheap negative, and this stops a
+  cheap positive.
 
 ### The subagent cast
 

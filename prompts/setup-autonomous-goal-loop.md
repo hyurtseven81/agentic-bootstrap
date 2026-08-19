@@ -1,6 +1,6 @@
 # Setup Prompt — Autonomous Goal-Loop Engineering System
 
-> **Prompt version: v4 (2026-08-01)** — bump on every amendment; cite the lesson or
+> **Prompt version: v5 (2026-08-19)** — bump on every amendment; cite the lesson or
 > incident that motivated it in the commit message.
 
 **How to use:** open an agent session (Claude Code or equivalent, strongest available
@@ -122,10 +122,13 @@ there are few of them.
    and the loop's Gate step re-checks the hash every iteration. Only they produce
    the numbers a completion claim cites. Where labels exist, agents never read
    them — sequester them (a directory the agent's tools are configured not to
-   read, or an object-store prefix the runtime role can't read). Changing them
-   ends the autonomous loop and requires human approval: **they and the GOAL file
-   are the two file-classes with a human gate** — the objective function and the
-   objective.
+   read, or an object-store prefix the runtime role can't read). The hash lock and
+   the read denial are locks on two *different* vectors and neither substitutes for
+   the other: the lock stops the objective being edited until it passes, the denial
+   stops held-out data reaching training. Install both. Changing any of those
+   artifacts ends the autonomous loop and requires human approval: **they and the
+   GOAL file are the two file-classes with a human gate** — the objective function
+   and the objective.
 3. **Append-only ledger.** One entry per iteration in `ledger/LEDGER.md`:
    timestamp, plan, commit SHA, diff summary, gate results, harness metrics (with
    artifact hashes), critic verdict **plus the path to its persisted findings**,
@@ -281,12 +284,45 @@ Each iteration, in order — a checklist the ledger entry mirrors:
    clean checkout for `done` or the reproducibility criterion to run against, and
    nothing the artifact hashes are anchored to.
 
+### Selection accounting, fixed budgets, and the ratchet's blind spot
+
+A metric-gated loop is a multiple-comparisons machine: every accept/reject decided
+against the eval split spends some of that split's power, and the loop makes hundreds
+of them where a human made five. No gaming is required for the final margin to be a
+selection artifact — just arithmetic. Three consequences worth building for:
+
+- **Count the selections.** Carry the running number of split-gated decisions in the
+  ledger and in the completion claim. A 0.3% win chosen from 200 attempts is a
+  different claim from a 0.3% win chosen from five, and after the fact the count is
+  the only thing that distinguishes them.
+- **Give every iteration the same evaluation budget, not the same workload** —
+  wall-clock or instance-hours fixed per run. Then iterations are directly comparable,
+  throughput is predictable, "how long will this take" stops being a question, and an
+  idea that needs more compute to show its effect competes on honest footing.
+- **Where a split the loop never selected against exists, `done` runs against it.**
+  The final verification (protocol step 7) is where it is consulted. An improvement
+  that does not survive it is overfitting to the search split, and the loop reports
+  exactly that instead of completing.
+
+Tell the human about the ratchet's blind spot rather than discovering it mid-goal: a
+strictly monotone accept rule cannot cross a valley — it will never take the temporary
+regression that unlocks a larger later gain. A goal needing one stalls, and a stall
+establishes "stalled under this accept rule," never "not achievable." Big swings stay
+with the human.
+
 ### Rule budget — the system must stay small
 
 Every rule cites the failure mode it defends against. The retro (Step 6) prunes
-gates that never fire. The invariants plus the iteration checklist should fit in
-the always-loaded context and be readable in two minutes — an unattended loop has
-no human to compensate for an instruction set it has stopped following.
+gates that never fire, and rules a stronger model no longer needs — scaffolding is a
+capability supplement dated to the model that needed it. The invariants plus the
+iteration checklist should fit in the always-loaded context and be readable in two
+minutes — an unattended loop has no human to compensate for an instruction set it has
+stopped following. That file is *advisory*: it arrives as ordinary conversation
+content, not as enforcement, and adherence decays as it grows. So treat it as a budget
+with a waiting list — anything a script can check belongs in `gates/run-all.sh`,
+anything only sometimes relevant belongs in a load-on-demand mechanism, and check the
+harness's current size guidance and context-inspection command rather than guessing at
+the ceiling.
 
 ## Step 4 — Build it
 

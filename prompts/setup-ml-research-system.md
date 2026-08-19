@@ -1,6 +1,6 @@
 # Setup Prompt — Agentic ML Research Development System
 
-> **Prompt version: v8 (2026-08-01)** — bump on every amendment; cite the lesson or
+> **Prompt version: v9 (2026-08-19)** — bump on every amendment; cite the lesson or
 > incident that motivated it in the commit message.
 
 **How to use:** open an agent session (Claude Code or equivalent, strongest available
@@ -21,7 +21,13 @@ Set up an agentic development system for complex ML research (recommender system
 ranking, retrieval, sequence models — any domain where experiments are expensive and
 conclusions are subtle). The owner is a human researcher who reads every hand-off and
 intervenes — **human-in-the-loop is a design feature, not a limitation to engineer
-away.**
+away.** Put the human where the model is weakest and keep them out of what it does
+well: agents are strong at data pipelines, ablation scaffolding, plots,
+artifact-backed tables, literature triage, and correctness review of exactly the bugs
+that fake results (silent shape/dtype coercions, split-boundary violations, leakage);
+they are weak at research taste. So **baseline strength, protocol and split design,
+and the go/no-go on whether a delta is real stay human-owned** — those three are where
+an agentic loop manufactures phantom progress fastest.
 
 The system you build must structurally defend against the three chronic failure modes
 of LLM-driven research:
@@ -172,6 +178,51 @@ scrutiny, one human turn per campaign instead of one per experiment — never as
 validated claim. Reach for it when the *volume of hand-carried turns*, not the
 difficulty of the science, is what is limiting the project.
 
+### Context layering — the always-loaded file is a budget, not a filing cabinet
+
+Instructions have four homes, distinguished by *when* they load and *how hard* they
+bind. Putting one in the wrong home is the quietest way a system this size fails:
+
+1. **The always-loaded root file** — read into every session in full, and *advisory*:
+   it arrives as ordinary conversation content, not as enforcement, and adherence
+   decays as it grows. It holds the invariants, the bootstrap ritual, the ownership
+   table, the current phase, and pointers. Nothing else.
+2. **On-demand procedures** — whatever the harness offers for load-when-relevant
+   instructions (skills, scoped or subdirectory instruction files). "How we run an
+   ablation", "how we build the results table", "how we launch and monitor a job":
+   multi-step and only sometimes relevant, so they should cost nothing until they are.
+3. **The per-experiment thinking** — the pre-registration and plan file, written once
+   per experiment and cited by the launch.
+4. **Mechanical gates** — hooks, locked artifacts, git, CI: the subset you refuse to
+   let the loop violate (invariant 7).
+
+Treat layer 1 as a budget with a waiting list. Check the harness's current size
+guidance and its context-inspection command rather than guessing — at authoring time
+the documented target is a couple hundred lines per instruction file, and an
+overstuffed one is documented to *reduce* rule-following rather than increase it. A
+rule earns its always-loaded line by naming the failure it prevents; anything a script
+can check moves to layer 4, anything only sometimes relevant to layer 2.
+
+Verify two loader properties on the installed version, because they decide what is
+safe to put where: scoped instruction files typically load only once the agent touches
+their subtree and are not necessarily re-injected after a context compaction — so a
+rule that must survive compaction belongs in the root file or in a gate, never *only*
+in a subdirectory file — and import directives expand at load, organizing text without
+saving context.
+
+**Plan → persist → clear → execute.** The chronic complaint about long sessions — the
+agent has lost the decisions it made two hours ago — is a context-management failure,
+not a missing rule, and a larger instruction file makes it worse. The fix is the
+rhythm pre-registration already implies: do the design thinking in a read-only
+planning mode, persist the result to the pre-reg/plan file, clear the context, and
+implement against the file. The written artifact, not the transcript, is what carries
+the decision; a session that has to *remember* to be correct is already broken.
+
+**Never let the agent compress its own record.** Curated memory is additive and
+dated: distilled patterns written alongside the append-only entries, never in place of
+them. A model asked to rewrite its own accumulating notes reliably loses more than it
+saves — the operational reason behind invariant 4.
+
 ### State files — the minimum durable set
 
 Whatever you name them, the system needs durable homes for: **goals** (the single
@@ -243,6 +294,28 @@ checkable — instead of a prose `Review: passed` line taken on trust: the decid
 checks the code-review file before approving a launch, and the human sees the
 direction-review file beside any claim-grade verdict.
 
+### The immutability contract — freeze the objective, not just the intent
+
+Write down, in one table the whole system can see, what an experiment may change (the
+knob under study, the training code, the configs it declares) and what it may not (the
+metric computation, the split definitions, the pipeline that produces them, frozen
+reference configs). Then stop trusting the table: back it with a pre-tool hook that
+refuses edits to the protected paths, and compute the number a verdict cites from a
+**read-only reference copy** of the eval code whose hash the launch record names.
+
+Two vectors, two locks, and neither covers the other. Locking the evaluator stops the
+metric being edited until it passes; denying the training runtime read access to the
+held-out data stops that data leaking into training. Install both, or expect whichever
+one you skipped. This is not a hypothetical risk: benchmarks that instrumented
+*ordinary, non-adversarial* ML agents found evaluator edits in a large fraction of
+episodes, eliminated by locking at a modest runtime cost. Read the rate as evidence
+about the mechanism rather than a forecast for your model — but the mechanism is real
+and the lock is cheap.
+
+The contract binds the human's convenience too: changing an evaluator or a split is a
+protocol amendment — dated, version-bumped, re-baselined, with prior numbers marked
+non-comparable — never an edit made to unblock a run.
+
 ### Defense in depth for long runs (failure mode 3)
 
 - **Golden-fixture eval tests before launch.** The eval harness must pass a test
@@ -254,6 +327,12 @@ direction-review file beside any claim-grade verdict.
 - **Mid-run gates.** Any run over a wall-clock threshold (hours, separate from the
   cost threshold) pre-registers a checkpoint-eval schedule with sanity bands and an
   early-kill rule. A four-day run never gets four days of unexamined trust.
+- **Launch detached, wait cheaply.** A long run belongs to the compute platform, not
+  to the session that started it: launch it detached (batch scheduler, managed
+  training job, terminal multiplexer), checkpoint so a lost session cannot lose the
+  run, and have the agent poll on a schedule proportional to the run's length and then
+  stop. An agent that babysits a multi-hour job spends its context asking whether the
+  job is done and has none left for reading the result.
 - **Salvage taxonomy on bug discovery.** Eval-code bug → re-eval existing
   checkpoints (hours). Data-pipeline bug → re-run affected arms. Training-code bug →
   full re-run. Logging bug → re-extract. The executor proposes the blast radius with
@@ -273,6 +352,21 @@ direction-review file beside any claim-grade verdict.
   over, no duplicates across splits, eval ran on the intended checkpoint, and the
   delta plausible against known baselines. A too-good-to-be-true number is a bug
   hypothesis first, a result second.
+- **Baseline strength is part of the claim.** The recurring finding across a decade of
+  recommender-systems reproducibility work is that carefully tuned classical baselines
+  match or beat the neural methods published as beating them. A loop that searches the
+  proposed method hundreds of times and the baseline once reproduces that illusion
+  faster — and every other mechanism here will certify the result as clean, because it
+  is: the arms were not comparably tuned. Record the tuning budget spent on *each* arm
+  in the verdict; a win over an under-searched arm is provisional; and the human, not
+  the loop, owns the call that the baseline is strong enough to be worth beating.
+- **Selection accounting.** Every keep/discard decision taken against the evaluation
+  split spends some of that split's power, and an agentic loop makes hundreds where a
+  human made five — no gaming required, just arithmetic. Carry the running count of
+  split-gated decisions as a first-class number in the verdict and discount a margin
+  in proportion to it. Keep a confirmation split the search loop never selects
+  against, consulted rarely and at claim time; a kept improvement that does not
+  survive it was overfitting, not a result.
 - **Crashes are reported as crashes** — never repackaged as results. A truncated
   run's numbers enter the record only labelled "partial, crashed at step N", and a
   partial number never feeds a verdict.
@@ -283,6 +377,12 @@ direction-review file beside any claim-grade verdict.
 - **Spot-checks on every verdict-bearing number,** not just large deltas or wins.
   Selection of what to spot-check is deterministic or human-chosen, never "the agent
   picks one at random" (it will pick the easiest).
+- **Tables are generated, never typed.** Fabricated numbers rarely show up in the
+  headline result, which everyone re-checks; they show up in ablation and analysis
+  tables that nobody re-derives — up to and including described experiments that were
+  never run. So every table and figure is produced by a script reading the run
+  artifacts, and a review of any draft checks *every* number against them, secondary
+  tables first.
 - **Claims are scale-bound.** A result at iteration scale is evidence at iteration
   scale; it neither promotes nor kills a claim-grade hypothesis. State the scale in
   every verdict.
@@ -341,8 +441,10 @@ direction-review file beside any claim-grade verdict.
 ### Rule budget — the system must stay small
 
 Every rule in the generated system cites the failure it defends against. The retro
-prunes rules that haven't fired and rules whose failure mode the harness now blocks
-mechanically. A system whose rule mass only grows becomes the drift it was built to
+prunes rules that haven't fired, rules whose failure mode the harness now blocks
+mechanically, and rules a stronger model no longer needs — scaffolding is a capability
+supplement dated to the model that needed it, and one that outlives its model is pure
+context cost. A system whose rule mass only grows becomes the drift it was built to
 prevent — instruction-following degrades with the number of simultaneously active
 constraints. Target: each role file readable in two minutes, with a short
 "every-turn" section up top and everything else as an exception manual.
@@ -356,19 +458,21 @@ amendment — never silent.
 
 ## Step 4 — Build it
 
-Generate the system: a slim root instruction file (bootstrap ritual, invariants,
-ownership table, pointers, and a one-line provenance stamp naming the setup prompt,
-its version, and the date that built this system, so a later reader can tell which
-vintage of the protocol they are running), role files sized per Step 3, the goals doc seeded from
-the interview, the state files, the `adr/` directory seeded with the design decisions
-already visible in the repo or history (each marked inferred — confirm), a `reviews/`
-directory (and a `handoffs/` directory
-only if you keep durable hand-off files per *State files*), `gates/`
-scripts for every mechanically checkable rule (pre-commitment tamper checks, hand-off
-field validation — including the headline-vs-instrumental role tag on every experiment
-and the headline-G-goal line on every verdict — staleness checks, secret scan on
-commit), hooks where the
-harness supports them, the code-reviewer and direction-reviewer subagent definitions
+Generate the system: a slim root instruction file sized to the layer-1 budget above
+(bootstrap ritual, invariants, ownership table, pointers, and a one-line provenance
+stamp naming the setup prompt, its version, and the date that built this system, so a
+later reader can tell which vintage of the protocol they are running), role files
+sized per Step 3, the goals doc seeded from the interview, the state files, the `adr/`
+directory seeded with the design decisions already visible in the repo or history
+(each marked inferred — confirm), a `reviews/` directory (and a `handoffs/` directory
+only if you keep durable hand-off files per *State files*), `gates/` scripts for every
+mechanically checkable rule (pre-commitment tamper checks, hand-off field validation —
+including the headline-vs-instrumental role tag on every experiment and the
+headline-G-goal line on every verdict — staleness checks, secret scan on commit), the
+immutability contract's mechanism where the harness supports it (a pre-tool hook
+refusing edits to the protected paths, the read-only reference evaluator and its hash,
+the training runtime's denial of held-out paths) and any other hooks the harness
+supports, the code-reviewer and direction-reviewer subagent definitions
 (committed in the project, not user-global, so a fresh clone or restarted session has
 the whole system from files alone), and memory initialization. Gate scripts belong to the
 decider role in the ownership table: the executor never edits a gate to make a turn
@@ -385,6 +489,9 @@ working equivalents, adapt and keep their names — continuity beats uniformity.
   passes, which is why it needs a reader that cannot remember.
 - Run every gate script; each must pass on the clean scaffold and demonstrably fail
   on a violation (test at least one).
+- **Test the immutability contract, don't assume it.** Attempt an edit to a protected
+  path and confirm it is refused; attempt to read a held-out path from the training
+  runtime's role and confirm the denial. A lock that was never tried is a comment.
 - Walk one simulated hand-off round-trip (executor → human → decider → human →
   executor): confirm both directions emit a copy-pasteable fenced block, and that a
   fresh session could recover the pending next-step from the durable records alone.
@@ -425,5 +532,10 @@ The system must improve itself as the project and the tooling evolve:
   local-result capture is the drift that most often forces a manual course-correction,
   so the check pays for itself. Offer to shorten the anchor to one line or narrow what
   the reviewer fires on — never to remove the goal-alignment check entirely.
+- If the human wants to skip tuning the baseline ("it's the weaker method, the delta
+  is huge"): the size of the delta is exactly what an under-searched baseline inflates,
+  and this system's field has a long record of deltas that evaporated once someone
+  tuned the simple method. Offer to *bound* the baseline's search budget, never to skip
+  it, and record the budget spent per arm in the verdict either way.
 - If an existing setup has a rule you'd prune but the human says it once saved them:
   keep it — their incident memory outranks your tidiness.

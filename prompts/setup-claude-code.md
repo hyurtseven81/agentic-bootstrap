@@ -1,6 +1,6 @@
 # Setup Prompt — Claude Code Harness Configuration
 
-> **Prompt version: v4 (2026-07-26)** — bump on every amendment; cite the lesson or
+> **Prompt version: v5 (2026-08-19)** — bump on every amendment; cite the lesson or
 > incident that motivated it in the commit message. Phase A re-evaluates this file
 > every run and proposes amendments when stale; after approval, backport them to
 > the canonical copy in the prompts repo.
@@ -167,6 +167,22 @@ to prove the window.
   two-minute read. Only cross-project conventions I confirm in the interview —
   every line costs attention in every future session. Anything project-shaped
   belongs to the project-system prompts instead.
+- LAYER instructions; don't accumulate them. The always-loaded file is ADVISORY —
+  delivered as ordinary conversation content, not as enforcement — and an overstuffed
+  one is documented to REDUCE rule-following rather than increase it, which is the
+  whole reason Phase 3's gates exist. Confirm the version's current documented size
+  target and its context-inspection command (at authoring time: a couple hundred lines
+  per memory file, and a `/context`-class command reporting what actually loaded),
+  record both in the run report, then route by layer: a repeated multi-step procedure
+  becomes a skill (Phase 4 — loads on demand); a rule a script can check becomes a
+  hook or permission rule (Phase 3); only always-true cross-project conventions stay
+  in the file. Where the installed version ships a memory-trimming diagnostic, run it
+  and show me its proposed cuts as a diff — trims are MY lines, so they need my
+  approval like any other. Record two loader properties too, because they decide what
+  is safe to put where: scoped/subdirectory instruction files load on demand and are
+  not necessarily re-injected after a compaction (so anything that must survive one
+  belongs in the root file or a gate), and import directives expand at load — they
+  organize text, they do not save context.
 
 ## Phase 3 — Permissions, hooks, sandbox — mechanical gates
 
@@ -181,6 +197,15 @@ paragraph asking for care; every gate cites its failure mode; the set stays smal
   arbitrary commands still prompt unless allowlisted. Confirm those boundaries
   against the installed version's docs and state them in the run report — they
   are the reason this posture is acceptable at all.
+- **Plan mode is automode's counterweight, and it is a permission mode rather than a
+  habit:** with per-edit prompts off, the cheap way to stop a non-trivial change
+  starting in the wrong direction is a read-only planning pass that produces a
+  reviewable plan before anything is written — and, where the version persists plans
+  to a file, an artifact that survives a context clear so the work can be executed
+  against it rather than against my memory of the conversation. Record its current
+  invocations (a mode cycle, a per-turn command, and a launch flag at authoring
+  time — verify) in the run report, along with the documented advice NOT to use it for
+  one-line diffs, where it is pure overhead.
 - **Permissions:** with per-edit prompts off, the rule lists are the control
   surface, so they get engineering attention first. Allowlist from observed
   friction, not speculation — the read-only operations I approve constantly
@@ -260,7 +285,9 @@ report.
   litter a real project.
 - Fresh-probe checklist: intended model + context reported; statusline shows the
   model; auto-memory active (memory dir gains content after a real task in the
-  fixture); one allowed read-only op runs without a prompt; an in-scope edit
+  fixture); the user-global instruction file is within the version's documented size
+  guidance and the context-inspection command shows it loading with nothing unexpected
+  beside it; one allowed read-only op runs without a prompt; an in-scope edit
   proceeds without a prompt (automode active); one denied destructive op is
   blocked despite auto-accept; each hook's positive and negative test passes; the
   fallback-model setting is present with the chosen value (config presence is the
