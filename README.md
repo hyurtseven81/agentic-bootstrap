@@ -133,6 +133,13 @@ These prompts deliberately avoid strict, frozen rulebooks. Each one carries:
   never bend; they're the floor that keeps an agent honest.
 - **Principles and a mechanism menu** — adapted to the project's domain, phase,
   and risk profile at setup time, not copied verbatim.
+- **A layered instruction surface** — the always-loaded file carries invariants and
+  pointers only; procedures load on demand; the per-task thinking is persisted to a
+  spec or pre-registration file and executed against *after* a context clear; and the
+  integrity-critical subset is enforced mechanically. Always-loaded text is advisory,
+  and adherence to it decays as it grows, so the prompts treat that file as a budget
+  rather than a filing cabinet: the fix for a long session losing its earlier
+  decisions is a written record the agent re-reads, never a longer instruction file.
 - **A self-evolution loop** — the generated system retros itself, prunes rules
   that never fire, amends itself with dated version bumps, and re-checks current
   harness capabilities (hooks, subagents, memory, …) at each phase boundary. The
