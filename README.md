@@ -2,7 +2,9 @@
 
 Self-contained prompts that, when run through a frontier model (Claude Opus/Fable
 in Claude Code or equivalent), **set up a tailored agentic development system** in
-the target project — instead of copying a fixed boilerplate.
+the target project — instead of copying a fixed boilerplate — plus two workflow
+prompts that start a project spec-first from a paper or an idea and review the
+resulting spec blind.
 
 ## The prompts
 
@@ -12,6 +14,8 @@ the target project — instead of copying a fixed boilerplate.
 | [`prompts/setup-autonomous-goal-loop.md`](prompts/setup-autonomous-goal-loop.md) | Autonomous goal loops — sibling of the ML-research prompt for goals whose success criteria are scripts exiting 0/1 against tamper-proof artifacts; a goal-definition command, unattended Plan→Implement→Verify→Evaluate→Critique→Decide iterations, frozen objective, append-only ledger, mechanical budget caps, escalation triggers |
 | [`prompts/setup-autonomous-research-campaign.md`](prompts/setup-autonomous-research-campaign.md) | Autonomous research campaigns — you write a brief (question, dataset, methodology space, reference papers, resource ceiling) and the system runs unattended to a positive result or an established dead end; subagent cast (implementer, code reviewer, literature and industry-practice scouts, critic, adjudicator), sequestered confirmation split, stuck ladder instead of stopping, exhaustion burden on failure |
 | [`prompts/setup-engineering-system.md`](prompts/setup-engineering-system.md) | Standard product engineering — CMS, ERP, SaaS; backend / frontend / API / gRPC; spec-first, contract discipline, test gates |
+| [`prompts/kickoff-spec-first-project.md`](prompts/kickoff-spec-first-project.md) | Starting a novel project from a paper, an idea, or a brief — sources read in full, data audited by query, the success policy written before any architecture, a spec tagged source / adaptation / assumption / measured in requirements → design → pre-registered plan stages, each behind a blind review; the setup prompts are seeded from it. Paste the whole prompt into an agent session, or its filled brief alone into a spec-driven tool |
+| [`prompts/review-plan-blind.md`](prompts/review-plan-blind.md) | Blind review of a spec, design, plan, or pre-registration in a separate session — sources read before the document, wrong / unjustified / missing / could-not-verify kept apart, a findings ledger with stable ids and defined severities, a second round that re-checks each id against the revision |
 | [`prompts/setup-dev-machine.md`](prompts/setup-dev-machine.md) | Provisioning the dev machine itself — macOS / Linux / Windows / WSL2, fresh or partial; shell, tmux, Neovim/LazyVim, runtimes, ML CLI tooling; idempotent, proxy-aware, approval-gated |
 | [`prompts/setup-claude-code.md`](prompts/setup-claude-code.md) | Configuring the Claude Code harness itself — strongest-model + largest-context default, auto-memory, auto-accept posture with mechanical gates, subagents, skills, plugins, MCP; idempotent, approval-gated, self-evolving |
 | [`prompts/upgrade-live-project-preamble.md`](prompts/upgrade-live-project-preamble.md) | Companion preamble — prepend to a setup prompt when the target project is already **live** (runs in flight, current state files) to force audit-and-upgrade mode with explicit do-not-touch constraints |
@@ -44,6 +48,16 @@ Pick by what you're setting up:
   "Metric ≥ threshold on the frozen eval split, tests green, reproducible"
   passes; "architecture X beats baseline Y under condition Z" never does — that
   is a research claim and belongs to the ML-research system.
+- **Nothing exists yet — a paper, an idea, a brief** →
+  [`kickoff-spec-first-project.md`](prompts/kickoff-spec-first-project.md) first.
+  It reads the sources in full, audits the data, writes the success policy before
+  any architecture, and produces a tagged spec in stages; the setup prompt you run
+  next builds the development system around that spec instead of interviewing it
+  out of you.
+- **A spec, design, or plan that needs an opinion its author can't give** →
+  [`review-plan-blind.md`](prompts/review-plan-blind.md) in a separate session, at
+  every stage gate — requirements before design, design before plan — because a
+  wrong objective is cheapest to catch at the first gate and fatal at the last.
 - **The project is already live** — runs in flight, current state files →
   prepend [`upgrade-live-project-preamble.md`](prompts/upgrade-live-project-preamble.md)
   to whichever prompt applies.
@@ -91,13 +105,20 @@ answers. A typical sequence for a research project:
 1. *(Optional)* Drop existing context into the empty folder — notes, a rough
    README, papers, dataset pointers, prior code. Reconnaissance reads it and
    the interview shrinks.
-2. Paste the primary prompt (`setup-ml-research-system.md`) and answer the
+2. *(If you're starting from a paper, an idea, or a brief rather than a formed
+   hypothesis)* Paste `kickoff-spec-first-project.md` with your kickoff brief. It
+   reads the sources in full, audits the data by query, writes the success policy
+   before any architecture, and produces a tagged requirements → design → plan
+   spec in stages — run `review-plan-blind.md` in a separate session at each
+   stage gate. The reviewed spec is the strongest form of step 1's context.
+3. Paste the primary prompt (`setup-ml-research-system.md`) and answer the
    interview — this is where you state the hypothesis ("X beats Y under
-   condition Z"), headline metrics, compute platform, and current phase. The
-   system it builds then owns `problems.md`, the goals doc, ADRs, and the rest.
-3. Work through the system it built: pre-register the claim, build the frozen
+   condition Z"), headline metrics, compute platform, and current phase; with a
+   kickoff spec in the folder the interview mostly confirms it. The system it
+   builds then owns `problems.md`, the goals doc, ADRs, and the rest.
+4. Work through the system it built: pre-register the claim, build the frozen
    harness, iterate with the human-in-the-loop protocol.
-4. When concrete subgoals pass the autonomy test and you want them ground
+5. When concrete subgoals pass the autonomy test and you want them ground
    unattended, paste `setup-autonomous-goal-loop.md` into a new session at the
    same root — it audits the existing setup and installs the loop alongside it.
 
@@ -124,7 +145,9 @@ The prompts distinguish two established states:
 
 ## Design philosophy
 
-These prompts deliberately avoid strict, frozen rulebooks. Each one carries:
+These prompts deliberately avoid strict, frozen rulebooks. Each system prompt
+carries all five of the following; the two workflow prompts carry the first two
+in miniature and exist for the fourth:
 
 - **A small set of hard invariants** — anti-fabrication, append-only history,
   pre-commitment before expensive/irreversible actions, mechanical gates over
@@ -140,6 +163,11 @@ These prompts deliberately avoid strict, frozen rulebooks. Each one carries:
   and adherence to it decays as it grows, so the prompts treat that file as a budget
   rather than a filing cabinet: the fix for a long session losing its earlier
   decisions is a written record the agent re-reads, never a longer instruction file.
+- **The author never grades its own work** — the blind reviewer at a spec's stage
+  gates, the context-free reader that dry-runs a bootstrap, the campaign's
+  adjudicator that never ran the experiments, the read-only critic in every loop.
+  A session that produced a thing will pass it; the check has to live in a context
+  that cannot remember producing it.
 - **A self-evolution loop** — the generated system retros itself, prunes rules
   that never fire, amends itself with dated version bumps, and re-checks current
   harness capabilities (hooks, subagents, memory, …) at each phase boundary. The
