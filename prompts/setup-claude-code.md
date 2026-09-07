@@ -1,6 +1,6 @@
 # Setup Prompt — Claude Code Harness Configuration
 
-> **Prompt version: v5 (2026-08-19)** — bump on every amendment; cite the lesson or
+> **Prompt version: v6 (2026-09-07)** — bump on every amendment; cite the lesson or
 > incident that motivated it in the commit message. Phase A re-evaluates this file
 > every run and proposes amendments when stale; after approval, backport them to
 > the canonical copy in the prompts repo.
@@ -16,9 +16,10 @@ Scope: the **agent harness itself** — model + context defaults, auto-memory,
 permissions, hooks, sandbox, subagents, skills, plugins, MCP servers — at user
 scope (`~/.claude/`), with project-scope conventions documented, never imposed.
 Companions: `setup-dev-machine.md` provisions the OS/toolchain underneath; the
-three system prompts (`setup-ml-research-system.md`, `setup-engineering-system.md`,
-`setup-autonomous-goal-loop.md`) build per-project process on top. A project-level
-concern discovered here gets noted for those prompts, not configured globally.
+four system prompts (`setup-ml-research-system.md`, `setup-engineering-system.md`,
+`setup-autonomous-goal-loop.md`, `setup-autonomous-research-campaign.md`) build
+per-project process on top. A project-level concern discovered here gets noted for
+those prompts, not configured globally.
 
 ## Source of truth
 
