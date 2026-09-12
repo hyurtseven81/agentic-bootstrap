@@ -1,6 +1,6 @@
 # Setup Prompt — Autonomous Research Campaign System
 
-> **Prompt version: v2 (2026-08-19)** — bump on every amendment; cite the lesson or
+> **Prompt version: v3 (2026-09-12)** — bump on every amendment; cite the lesson or
 > incident that motivated it in the commit message.
 
 **How to use:** open an agent session (Claude Code or equivalent, strongest available
@@ -201,6 +201,9 @@ let the campaign run, read the report, amend, run again. Something like:
 # CAMPAIGN-NNN: <question>              <!-- Brief version: 1 -->
 ## Question            <!-- the comparison and the metric, not a wish -->
 ## Claim shape         <!-- what a positive answer asserts, at what scale -->
+## Decision this informs   <!-- what changes if the answer is yes, and if it is no -->
+## Origin              <!-- idea | ticket | incident | retro finding | killed entry -->
+                       <!-- plus the intent's path@sha, if one exists -->
 ## Dataset & splits    <!-- paths, split rule, which split is sequestered -->
 ## Methodology space   <!-- enumerated branches, each: name, rationale, source -->
 ## Out of scope        <!-- branches deliberately excluded -->
@@ -219,6 +222,10 @@ The pre-registered failure explanations are written now, while the human is neut
 because they are the checklist invariant 5 forces the loop to work through before it
 may call anything a dead end. Writing them at verdict time, when the loop is anchored
 on its own null result, is worthless.
+
+The *decision this informs* line is what gives a dead end a consumer. A negative
+nobody will act on is the first thing an unattended loop stops defending, so a brief
+without one goes back to the human before the campaign starts.
 
 ### The experiment unit — fix the budget, not the workload
 
@@ -267,14 +274,16 @@ Three guards on the pattern, all absent from the naive version:
 Roles, each with the narrowest tool set that lets it work, all defined as committed
 project files so a fresh clone has the whole system:
 
-- **Implementer** — writes one experiment's code. The *only* role that edits the
-  experiment surface, and it never touches the harness, the splits, the gates, or the
-  brief.
+- **Implementer** — writes one experiment's code, inside the scope its proposal
+  declared. The *only* role that edits the experiment surface, and it never touches
+  the harness, the splits, the gates, or the brief.
 - **Code reviewer** (read-only) — a scientific-correctness pass *before* a run spends
-  money: leakage, split-boundary violations, whether the config actually reached the
-  model, metric wiring, silent shape/dtype coercions. This is the cheapest defense in
-  the system — it costs minutes and it is what stops a GPU-day from being spent on a
-  leak.
+  money. It reads the proposal first — the branch it serves, the predicted effect, the
+  declared scope — then the diff against that scope: leakage, split-boundary
+  violations, whether the config actually reached the model, metric wiring, silent
+  shape/dtype coercions. A diff outside the declared scope is returned, not reviewed.
+  This is the cheapest defense in the system — it costs minutes and it is what stops
+  a GPU-day from being spent on a leak.
 - **Literature scout** (read-only, network) — runs at campaign start to expand the
   methodology space from the brief's references, and again on the stuck trigger,
   seeded with the campaign's *actual failure pattern* as the query rather than the
@@ -325,7 +334,15 @@ a question: a trivial fix (typo, missing import, obvious shape bug) is fixed and
 re-run; a fundamentally broken idea is logged with `crash` status and abandoned; a
 run past its budget multiple is killed and treated as a discard. Log every one of
 them — a crash is a data point about the space, and a leaderboard that hides crashes
-overstates how much of the space was explored.
+overstates how much of the space was explored. But a run that answered nothing is
+not a result: repairs happen on the same experiment, and two consecutive non-answers
+on one experiment, or the same failure on a second, are a *setup* problem — the
+branch is logged `blocked`, which is neither "tried at the registered scale" nor
+"excluded with a written reason", so it is a hole in the exhaustion record that keeps
+a dead-end verdict unavailable until a human clears it. None of it counts toward the
+stall N, because nothing was tested. Once a run has answered, that experiment's code
+is frozen and a new idea is a new experiment — the record keeps the exact code every
+number came from.
 
 ### Drift defense
 
@@ -363,6 +380,12 @@ is installed, that system owns the goals doc, the ADRs, and the killed register;
 this campaign reads them and appends to them rather than standing up rivals, and its
 terminal verdict enters there as described above.
 
+The stepwise workflow sibling, `run-plan-stepwise.md`, is the attended form of this
+loop for a single plan — intent, step plan, blind plan review, one step per fresh
+context, a done claim validated by a context that did not execute. Inside a campaign
+each iteration's proposal is already a one-step plan under the cast's review and
+critique, so nothing more is installed here.
+
 Sibling references are pointers for the human, not files to read: each sibling is a
 separate, self-contained setup prompt from the same collection this one came from,
 installed by pasting it into its own session at this project root. Never assume a
@@ -375,7 +398,11 @@ written per *file*; this collision is per *tree*, so nothing changes owner and t
 table cannot see it. The likeliest harm is not lost work but **evidence
 contamination** — gates, diffs, and metrics running against another session's
 uncommitted edits, so invariants 1 and 3 faithfully record work the campaign did not
-do.
+do. Make the contamination impossible rather than forbidden: runs execute from an
+immutable snapshot of the recorded commit, never the working tree, and every run
+echoes its effective configuration and final metrics to its own log — so a run cannot
+record work the campaign did not commit, and an unapplied config is visible from the
+artifact rather than only to the reviewer.
 
 ### Rule budget — the system must stay small
 
@@ -409,7 +436,8 @@ Generate the system, in this order:
    not a prompt that expands into the current one — the latter grinds a single context
    across the whole campaign and fails invisibly, because the log still looks right.
 4. **Gates**, exit codes and no prose, called every iteration: harness-manifest hash,
-   sequestered-split access check, budget and spend caps, leaderboard/log schema,
+   sequestered-split access check, proposal-scope conformance (the diff touches only
+   the paths the proposal declared), budget and spend caps, leaderboard/log schema,
    review-file-exists-at-cited-SHA, and an exhaustion-record validator that
    mechanically refuses an incomplete dead-end claim.
 5. **Permissions and sequestration.** Configure the confirmation split's isolation and
@@ -449,7 +477,10 @@ equivalents, adapt and keep their names.
 - On every terminal state, run a retro: which invariants fired, which gates never
   fired (prune candidates), whether the stuck ladder produced usable ideas at which
   rung, how many selections the champion survived, and what new failure mode appeared
-  (gate candidate). Amend the generated system with a dated version bump.
+  (gate candidate). Amend the generated system with a dated version bump. Count from
+  git, not memory: brief amendments after the first run, proposed amendments the human
+  accepted versus dismissed, and runs repaired versus answered — diagnostics, never
+  targets.
 - Feed the retro back into the *next* brief: branches the campaign exhausted move to
   the killed register, candidates the scouts surfaced but never tried become proposed
   amendments for the human to accept or drop.
