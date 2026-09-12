@@ -1,6 +1,6 @@
 # Setup Prompt — Claude Code Harness Configuration
 
-> **Prompt version: v6 (2026-09-07)** — bump on every amendment; cite the lesson or
+> **Prompt version: v7 (2026-09-12)** — bump on every amendment; cite the lesson or
 > incident that motivated it in the commit message. Phase A re-evaluates this file
 > every run and proposes amendments when stale; after approval, backport them to
 > the canonical copy in the prompts repo.
@@ -206,7 +206,13 @@ paragraph asking for care; every gate cites its failure mode; the set stays smal
   against it rather than against my memory of the conversation. Record its current
   invocations (a mode cycle, a per-turn command, and a launch flag at authoring
   time — verify) in the run report, along with the documented advice NOT to use it for
-  one-line diffs, where it is pure overhead.
+  one-line diffs, where it is pure overhead. Verify the gate in the *headless* form
+  too, if anything here will drive one: probe whether a non-interactive session can
+  leave plan mode without a human answering — an open-source harness integration
+  reports that headless plan mode self-approved its own exit on the version it
+  tested, and had to force an `ask` through a PreToolUse hook routed to a
+  permission-prompt tool. Record what the installed version does; a plan gate that
+  holds only interactively is a comment.
 - **Permissions:** with per-edit prompts off, the rule lists are the control
   surface, so they get engineering attention first. Allowlist from observed
   friction, not speculation — the read-only operations I approve constantly
