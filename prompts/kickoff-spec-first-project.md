@@ -1,6 +1,6 @@
 # Kickoff Prompt — Spec-First Start of a Novel Project
 
-> **Prompt version: v1 (2026-09-07)** — bump on every amendment; cite the lesson or
+> **Prompt version: v2 (2026-09-12)** — bump on every amendment; cite the lesson or
 > incident that motivated it in the commit message.
 
 **How to use:** fill in the **kickoff brief** at the end of this file, then run it one
@@ -78,6 +78,9 @@ defends against none of them is padding — leave it out.
    pre-registration directory. If one exists, integrate: write the spec into its
    specs directory under its names, and *propose* seeds for its goals doc in the
    hand-off rather than editing files its ownership table assigns to another role.
+   Look also for a plain-language **intent** — an intent file, a ticket, a note from
+   whoever wants this — and read it before the sources: the spec's objective must
+   trace to it.
 2. **Read every source in full.** The HTML or PDF, every section, the appendix, every
    table — not the abstract, not a blog summary, not your memory of it. If a source
    cannot be fetched from this session, stop and say so; reconstructing a paper from
@@ -96,6 +99,14 @@ defends against none of them is padding — leave it out.
 
 Ask only what reconnaissance and the brief couldn't answer. Typically:
 
+- **The intent, in the originator's own words — if none is written down yet.** The
+  problem, why now and the decision the answer informs (for a research question:
+  what changes if the answer is *no*), affected people and systems, constraints, out
+  of scope, open questions, and where the request came from. Write it as they said
+  it, let them correct it, commit it with author and date, and get the owner's
+  acceptance before any stage starts. It is the cheapest gate in the workflow, where
+  a question not worth asking should die, and the file every stage's objective
+  traces to by path and commit.
 - **The objective, in their words, and the success policy.** What does "right" mean
   for this product; who judges it (a human panel, an LLM judge, engagement); on what
   dimensions; how do judgements on those dimensions combine into one verdict. Push
@@ -258,7 +269,14 @@ reason), or *deferred* (with an owner and a date) — bump the version, commit a
 The ledger and the responses are **append-only** and live in the repo beside the
 spec: a finding is never edited or deleted, only responded to. A blocker is never
 closed by silence. The blindness is structural: the reviewer is given the document
-and the sources, never this prompt, the brief, or the interview.
+and the sources, never this prompt, the brief, or the interview. Where the harness
+offers a context-free subagent, the review may run there instead of a separate human
+session — provided the subagent is started by a fixed, committed command that passes
+only paths (the review prompt, the stage document, the sources), never prose the
+authoring session composes, because a session that writes its own review request
+leaks its framing into the reviewer. The separate-session form remains the stronger
+gate and the default at the requirements stage, where a wrong objective is cheapest
+to catch and the author's framing is most contagious.
 
 ### Hand-off into development
 
@@ -324,7 +342,10 @@ Once, before hand-off:
   not a parallel record it has to reconcile.
 - After the first experiment cycle, retro the spec, not just the result: which
   assumptions were wrong, which reviewer findings turned out to matter and which did
-  not, which mapping joints held. Amend the spec with a dated version bump.
+  not, which mapping joints held. Amend the spec with a dated version bump. Count
+  from git, not memory: amendments to the spec after its first pre-registered
+  experiment ran, and the share of intents that reached a reviewed plan rather than
+  dying at acceptance — diagnostics for the retro, never targets.
 - When a lesson is project-agnostic — a failure mode this prompt didn't name, a check
   worth standardizing — the human backports it to the repo this prompt lives in; the
   prompt is versioned and evolves the same way the specs it produces do.
@@ -402,6 +423,9 @@ Also list what the source does NOT do or claim. The reviewer will check this.
 </sources>
 
 <objective>
+[If an accepted intent exists — the problem, why now, the decision the answer
+informs, affected people and systems, constraints, out of scope, open questions —
+cite its path and commit; the paragraph below restates it, never replaces it.]
 [One paragraph: what is being built, for whom, the use cases with two or three
 example inputs, and what would make it a success — the comparison and the metric
 if you already know them. Name the incumbent it must beat.]
@@ -494,5 +518,7 @@ Milestones with compute estimates as ranges. Close with the risk register.
 - Each stage document is self-contained for a reviewer who has not seen this
   brief: source list, tag legend, and a version header with a provenance stamp
   at the top.
+- The objective traces to the accepted intent by path and commit; a spec whose
+  objective the intent's author would not recognize is a defect.
 </rules>
 ```
