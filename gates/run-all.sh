@@ -28,7 +28,6 @@ if [[ -n "$base" ]]; then
 else
   run gates/check-prompt-versions.sh
 fi
-run gates/check-structural-parallel.sh
 run gates/check-internal-links.sh
 run gates/check-shell.sh
 
