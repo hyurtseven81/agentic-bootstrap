@@ -1,6 +1,6 @@
 # Setup Prompt — Agentic ML Research Development System
 
-> **Prompt version: v9 (2026-08-19)** — bump on every amendment; cite the lesson or
+> **Prompt version: v11 (2026-09-12)** — bump on every amendment; cite the lesson or
 > incident that motivated it in the commit message.
 
 **How to use:** open an agent session (Claude Code or equivalent, strongest available
@@ -75,6 +75,10 @@ Ask only what reconnaissance couldn't answer. Typically:
 - Compute platform and the cost/duration threshold above which a run is "expensive"
   (this gates pre-registration and mid-run monitoring).
 - The scale ladder: cheap-iteration scale → claim-grade scale → production scale.
+- If any search will run unattended (a goal loop over a methodology space, an
+  autoresearch substrate): the enumerated branches it may explore. Exhaustion is
+  undefinable over an open-ended space, so "find the best architecture" can never
+  yield a defended dead end.
 - Current phase: exploration / baselines reproduced / paper claims active. This
   calibrates how much enforcement to install on day 1.
 - Past pain: what has actually gone wrong on this project before. Their answers
@@ -165,18 +169,21 @@ verdicts under symmetric scrutiny (invariant 2). The research claim itself
 never runs unattended: autonomous loops optimize proxies, and research
 conclusions are the easiest proxies to game.
 
-There is a third sibling, `setup-autonomous-research-campaign.md`, for the case
-this section does *not* cover: the human wants a whole research question — brief,
-methodology space, literature, resource ceiling — pursued unattended to a positive
-result or an established dead end, rather than hand-carrying every experiment turn.
-It runs the claim autonomously anyway, which this prompt otherwise refuses, and pays
-for it structurally: an evidentiary burden on *failure* that exceeds the burden on
-success, an evaluation split sequestered from the search loop, and a terminal verdict
-adjudicated by a context that did not run the experiments. Its output arrives here as
-a defended draft conclusion — an executor result under invariant 2's symmetric
-scrutiny, one human turn per campaign instead of one per experiment — never as a
-validated claim. Reach for it when the *volume of hand-carried turns*, not the
-difficulty of the science, is what is limiting the project.
+There is no sibling for running the research *claim* unattended, on purpose. When the
+volume of hand-carried turns, not the difficulty of the science, is what limits the
+project, the split is: the mechanically verifiable subgoals run in the goal loop, the
+search runs on whatever autoresearch substrate the project has, and its output enters
+here as an executor result under invariant 2 — and, because nobody read the
+intermediate results, under the dead-end burden in *Defense against premature
+verdicts* below.
+
+A second sibling, `run-plan-stepwise.md`, is a *workflow* rather than a system: it
+takes one piece of work from an intent in the originator's words through a step plan,
+a blind plan review, and execution one step per fresh context, to a done claim
+validated by a context that did not execute — adopting this system's pre-registration,
+verdict log, and reviewers as its own files rather than standing up rivals. Reach for
+it when the risk is losing a multi-step plan mid-way or calling it done early, not
+whether to run it unattended.
 
 ### Context layering — the always-loaded file is a budget, not a filing cabinet
 
@@ -217,6 +224,20 @@ rhythm pre-registration already implies: do the design thinking in a read-only
 planning mode, persist the result to the pre-reg/plan file, clear the context, and
 implement against the file. The written artifact, not the transcript, is what carries
 the decision; a session that has to *remember* to be correct is already broken.
+
+**Review the plan blind, then run it one step per context.** Two additions make that
+rhythm hold across a multi-step plan. Before the first step runs, a context that did
+not write the plan reviews it — the code reviewer for correctness and, when the plan
+will spend above the interview's cost threshold, the direction reviewer for whether
+it serves the registered G-goal — started by a fixed, committed command that passes
+only paths, because a session that composes its own review request leaks its framing
+into the reviewer and the review stops being blind. Then
+each step runs in a fresh context that restates the G-goal and the step id before
+acting; every step declares, before it runs, the paths it may touch and the
+verification that closes it; a diff outside that scope fails a gate unless a dated
+plan amendment sits in the same commit; and a deviation amends the plan before or
+with the change, never after. A plan executed from memory of the conversation that
+wrote it is exactly the drift this section exists to prevent.
 
 **Never let the agent compress its own record.** Curated memory is additive and
 dated: distilled patterns written alongside the append-only entries, never in place of
@@ -267,24 +288,16 @@ every config value (rule budget). An ADR reconstructed from history is marked
 `proposed — inferred` until the decider confirms it, so a guessed rationale is never
 asserted as fact (invariant 1).
 
-**Hand-offs: separate the carry from the record — they are different problems**, and
-conflating them invites bespoke machinery the harness already obviates. *Carrying* the
-block into the other session is the harness's job, not yours: have each role emit its
-hand-off as a single fenced code block and let the human use the native code-block copy
-(whatever the harness offers). That is symmetric for free — both roles emit a
-block, so neither is "the one that emits a file" while the other "emits chat text" (the
-asymmetry that actually confuses people). Do **not** build a custom copy command for
-this: a slash command cannot reach the system clipboard except by shelling to
-OS-specific tools (`pbcopy`/`xclip`/`clip.exe`) that fail on web and over SSH, so it
-either duplicates the native button or breaks — build one only where probing shows no
-native affordance and a portable clipboard tool exists. Probe before assuming there is
-none: the terminal is where these prompts are most often pasted, and it is no longer the
-affordance-free case. *Durability* — surviving a crashed session — is the separate concern, and it is
-already carried by the verdict log (the decider's per-turn next-step) and the run-state
-file (the executor's latest results): make those entries rich enough that a fresh
-session recovers the pending hand-off from them alone. A parallel `handoffs/` file tree
-is justified only when they can't — then widen them or keep a lightweight handoff file;
-don't stand up a second source of truth by default.
+**Hand-offs: separate the carry from the record — they are different problems.**
+*Carrying* the block into the other session is the harness's job: each role emits its
+hand-off as a single fenced code block and the human uses the native code-block copy,
+symmetric in both directions. Do not build a custom copy command — a slash command
+reaches the clipboard only through OS-specific tools that fail on web and over SSH,
+so it duplicates the native button or breaks. *Durability* — surviving a crashed
+session — is already carried by the verdict log (the decider's per-turn next-step)
+and the run-state file (the executor's latest results): make those entries rich
+enough that a fresh session recovers the pending hand-off from them alone, and add a
+`handoffs/` file tree only when they can't.
 
 **Review evidence is state too.** Each reviewer's raw findings are persisted to a file
 keyed to what it reviewed — the code reviewer to the commit (e.g. `reviews/<sha>.md`),
@@ -327,12 +340,16 @@ non-comparable — never an edit made to unblock a run.
 - **Mid-run gates.** Any run over a wall-clock threshold (hours, separate from the
   cost threshold) pre-registers a checkpoint-eval schedule with sanity bands and an
   early-kill rule. A four-day run never gets four days of unexamined trust.
-- **Launch detached, wait cheaply.** A long run belongs to the compute platform, not
-  to the session that started it: launch it detached (batch scheduler, managed
-  training job, terminal multiplexer), checkpoint so a lost session cannot lose the
-  run, and have the agent poll on a schedule proportional to the run's length and then
-  stop. An agent that babysits a multi-hour job spends its context asking whether the
-  job is done and has none left for reading the result.
+- **Launch detached, from a snapshot, and wait cheaply.** A long run belongs to the
+  compute platform, not to the session that started it: launch it detached (batch
+  scheduler, managed training job, terminal multiplexer) from an immutable snapshot
+  of the launch commit — uncommitted edits never reach a run, so an artifact cannot
+  record work the session did not commit — have the run echo its effective
+  configuration and final metrics to its own log, so an unapplied config is visible
+  from the artifact rather than only to a reviewer, checkpoint so a lost session
+  cannot lose the run, and have the agent poll on a schedule proportional to the
+  run's length and then stop. An agent that babysits a multi-hour job spends its
+  context asking whether the job is done and has none left for reading the result.
 - **Salvage taxonomy on bug discovery.** Eval-code bug → re-eval existing
   checkpoints (hours). Data-pipeline bug → re-run affected arms. Training-code bug →
   full re-run. Logging bug → re-extract. The executor proposes the blast radius with
@@ -370,6 +387,26 @@ non-comparable — never an edit made to unblock a run.
 - **Crashes are reported as crashes** — never repackaged as results. A truncated
   run's numbers enter the record only labelled "partial, crashed at step N", and a
   partial number never feeds a verdict.
+- **A run that answered nothing is not a result.** A crash, an OOM, a missing
+  dependency, an unapplied config, or a timeout establishes nothing about the
+  hypothesis: the experiment is repaired in place and re-run, and after a bounded
+  number of repairs it escalates as a *setup* problem — never as a null result, and
+  never counted as "no effect". Only a run whose evaluation actually ran bears on a
+  verdict; once one has, that experiment's code is frozen and a new idea is a new
+  experiment, so the record keeps the exact code every number came from.
+- **An unattended loop's dead end carries the burden of proof.** Where any search
+  runs without a human reading intermediate results — a goal loop over a
+  methodology space, an autoresearch substrate — "nothing worked" is the cheapest
+  conclusion it can reach and the hardest to falsify, so a dead-end claim is invalid
+  unless an exhaustion record shows every registered branch tried at the registered
+  scale or excluded with a written reason, the negative reproduced on a second seed
+  and where possible a second measurement path, each pre-registered non-scientific
+  explanation ruled out by a cited check, the golden fixture green at the terminal
+  SHA, and a fresh literature pass returning no untried candidate — checked item by
+  item by a context that did not run the experiments. Any hole → not a dead end:
+  keep going or escalate, never conclude. The burden on failure runs higher than the
+  burden on success, because a positive is defended by pointing at an artifact and a
+  negative needs no artifact at all.
 - **Pre-registered failure explanations:** the pre-commitment includes "if this
   FAILs, the three most likely *non-scientific* explanations and the check that
   rules each out" — written at design time, when the model is neutral, not at
@@ -436,7 +473,9 @@ non-comparable — never an edit made to unblock a run.
   capture the agenda? — plus register health, debt accumulation, and, critically, a
   cumulative-delta sanity check: do the per-experiment deltas reported since the last
   retro sum to the actual movement against the baseline? This is the program-level
-  fabrication detector.
+  fabrication detector. Count from git, not memory, the plan and pre-registration
+  amendments made after their first launch — the drift a retro can measure rather
+  than sense.
 
 ### Rule budget — the system must stay small
 
@@ -526,8 +565,9 @@ The system must improve itself as the project and the tooling evolve:
   sessions) and *judgment* (deciding what it means). Only the second earns a human;
   automate the first with whatever the harness offers. If after that the turn count
   still scales with the number of experiments rather than the number of claims, the
-  honest answer is not a thinner gate here but the campaign sibling above, which
-  removes the human from the inner loop and pays the structural price for it.
+  honest answer is not a thinner gate here but the split above: subgoals to the goal
+  loop, the search to an autoresearch substrate, and its output adjudicated here
+  under the dead-end burden — the claim itself still never runs unattended.
 - If the human asks to drop the headline anchor or the direction reviewer as overhead:
   local-result capture is the drift that most often forces a manual course-correction,
   so the check pays for itself. Offer to shorten the anchor to one line or narrow what

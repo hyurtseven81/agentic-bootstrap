@@ -1,6 +1,6 @@
 # Review Prompt — Blind Assessment of a Spec, Design, or Plan
 
-> **Prompt version: v1 (2026-09-07)** — bump on every amendment; cite the lesson or
+> **Prompt version: v2 (2026-09-12)** — bump on every amendment; cite the lesson or
 > incident that motivated it in the commit message.
 
 **How to use:** open a **fresh** session — never the one that produced the document,
@@ -12,6 +12,12 @@ document, the brief, the interview, or the author's reasoning: the reviewer's va
 is that it has none of the author's context. Feed the findings ledger it returns to
 the authoring session, which responds per finding; paste the responses *and the
 revised document* back here for the second round.
+
+The same prompt can run in a **context-free subagent** where the harness offers one:
+it must be started by a fixed, committed command that passes only this prompt and the
+document and source paths — never prose the authoring session composes, which would
+leak the author's framing into the review. For claim-grade or irreversible plans the
+separate human session above remains the stronger form.
 
 Scope: planning artifacts — a requirements document, a technical design, a task or
 experiment plan, a research brief, a pre-registration, a decision record. Not code
@@ -113,7 +119,12 @@ unless asked to front-load one.
    matched in capacity *and* tuning budget; decision rules stated before the runs;
    seeds and variance; whether the evaluation can detect the effects the hypotheses
    predict; whether the ordering front-loads the experiments most likely to change
-   the plan.
+   the plan. For a task plan rather than an experiment plan: whether each step
+   changes one thing, declares the paths it may touch, names what the prior step
+   established that it builds on, and carries a verification a stranger could run,
+   written before the step runs; what each step could break and which is the
+   riskiest; what the author chose not to do; and whether the plan says what *done*
+   means.
 7. **Systems realism.** Does the design survive the move from the source's scale and
    hardware to this project's? Memory, sharding, latency at the target percentile,
    cost, and the assumptions each derived number rests on.

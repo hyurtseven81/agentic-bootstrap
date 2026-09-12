@@ -1,9 +1,8 @@
 # CLAUDE.md
 
 This repo is a collection of **setup prompts** for agentic development systems —
-see `README.md`. It is not itself a research project; the two-session
-Lead/Scientist protocol described under `reference/legacy-strict-template/` does
-NOT govern sessions in this repo.
+see `README.md`. It is not itself a research project, and none of the prompts
+govern sessions in this repo.
 
 ## Working on this repo
 
@@ -26,18 +25,24 @@ NOT govern sessions in this repo.
   what the bump check can see. The bump check reads the working tree, so it catches
   an unbumped edit before the commit exists. CI runs the same script on every PR.
 - When editing the system prompts (`setup-ml-research-system.md`,
-  `setup-engineering-system.md`, `setup-autonomous-goal-loop.md`,
-  `setup-autonomous-research-campaign.md`), keep them in
+  `setup-engineering-system.md`, `setup-autonomous-goal-loop.md`), keep them in
   structural parallel where their content overlaps (recon → interview →
   invariants → principles → build → verify → evolution loop) so lessons can be
   backported across them easily.
-- `kickoff-spec-first-project.md` and `review-plan-blind.md` are *workflow* prompts,
-  not system prompts: they run before or beside a system rather than building one,
-  so they are deliberately outside the structural-parallel gate. Keep the review
-  prompt blind — it may name its kickoff sibling for the human, but must never
-  describe what that prompt asked the author to produce: its lenses are field
-  standards, not the kickoff's section list. A reviewer that knows the rubric
-  grades the rubric.
-- `reference/legacy-strict-template/` is frozen prior art — don't extend it;
-  backport lessons into the prompts instead.
+- `setup-engineering-system.md` is on probation as of 2026-09-12: every change to it
+  so far was a parallel copy of an ML-research lesson. If no engineering-specific
+  lesson lands by the next retro, retire it to `reference/` the same way the
+  campaign prompt was.
+- `kickoff-spec-first-project.md`, `review-plan-blind.md`, and `run-plan-stepwise.md`
+  are *workflow* prompts, not system prompts: they run before or beside a system
+  rather than building one, so they are deliberately outside the structural-parallel
+  gate. Keep the review prompt blind — it may name its kickoff sibling for the human,
+  but must never describe what that prompt asked the author to produce: its lenses
+  are field standards, not the kickoff's section list. A reviewer that knows the
+  rubric grades the rubric.
+- `reference/` holds retired prompts, frozen as prior art — don't extend them;
+  backport lessons into the live prompts instead. A retirement is a `git mv` into
+  `reference/` with a dated note at the top saying why and where the live
+  mechanisms went. The original v1 boilerplate was deleted from the tree on
+  2026-09-12 and is reachable at commit `bcb6304`, the last one that carried it.
 - Conventional commits (`feat(prompts):`, `docs(readme):`, …).

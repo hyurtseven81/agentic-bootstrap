@@ -2,9 +2,10 @@
 
 Self-contained prompts that, when run through a frontier model (Claude Opus/Fable
 in Claude Code or equivalent), **set up a tailored agentic development system** in
-the target project — instead of copying a fixed boilerplate — plus two workflow
-prompts that start a project spec-first from a paper or an idea and review the
-resulting spec blind.
+the target project — instead of copying a fixed boilerplate — plus three workflow
+prompts that start a project spec-first from a paper or an idea, review the
+resulting spec blind, and run a plan step by step without losing it or calling it
+done early.
 
 ## The prompts
 
@@ -12,10 +13,10 @@ resulting spec blind.
 |---|---|
 | [`prompts/setup-ml-research-system.md`](prompts/setup-ml-research-system.md) | Complex ML research — recsys, ranking, retrieval; expensive experiments, human-in-the-loop Lead/Scientist split, pre-registration, verdict discipline |
 | [`prompts/setup-autonomous-goal-loop.md`](prompts/setup-autonomous-goal-loop.md) | Autonomous goal loops — sibling of the ML-research prompt for goals whose success criteria are scripts exiting 0/1 against tamper-proof artifacts; a goal-definition command, unattended Plan→Implement→Verify→Evaluate→Critique→Decide iterations, frozen objective, append-only ledger, mechanical budget caps, escalation triggers |
-| [`prompts/setup-autonomous-research-campaign.md`](prompts/setup-autonomous-research-campaign.md) | Autonomous research campaigns — you write a brief (question, dataset, methodology space, reference papers, resource ceiling) and the system runs unattended to a positive result or an established dead end; subagent cast (implementer, code reviewer, literature and industry-practice scouts, critic, adjudicator), sequestered confirmation split, stuck ladder instead of stopping, exhaustion burden on failure |
 | [`prompts/setup-engineering-system.md`](prompts/setup-engineering-system.md) | Standard product engineering — CMS, ERP, SaaS; backend / frontend / API / gRPC; spec-first, contract discipline, test gates |
 | [`prompts/kickoff-spec-first-project.md`](prompts/kickoff-spec-first-project.md) | Starting a novel project from a paper, an idea, or a brief — sources read in full, data audited by query, the success policy written before any architecture, a spec tagged source / adaptation / assumption / measured in requirements → design → pre-registered plan stages, each behind a blind review; the setup prompts are seeded from it. Paste the whole prompt into an agent session, or its filled brief alone into a spec-driven tool |
 | [`prompts/review-plan-blind.md`](prompts/review-plan-blind.md) | Blind review of a spec, design, plan, or pre-registration in a separate session — sources read before the document, wrong / unjustified / missing / could-not-verify kept apart, a findings ledger with stable ids and defined severities, a second round that re-checks each id against the revision |
+| [`prompts/run-plan-stepwise.md`](prompts/run-plan-stepwise.md) | Taking one piece of work from intent to a validated done — the intent captured in the originator's own words and accepted before planning, a step plan a stranger could execute, a blind plan review by a context-free subagent (or the review sibling for claim-grade work), one step per fresh context against the committed plan with a scope-conformance gate, and a done claim validated by a context that did not execute; runs inside any system from this collection or alone |
 | [`prompts/setup-dev-machine.md`](prompts/setup-dev-machine.md) | Provisioning the dev machine itself — macOS / Linux / Windows / WSL2, fresh or partial; shell, tmux, Neovim/LazyVim, runtimes, ML CLI tooling; idempotent, proxy-aware, approval-gated |
 | [`prompts/setup-claude-code.md`](prompts/setup-claude-code.md) | Configuring the Claude Code harness itself — strongest-model + largest-context default, auto-memory, auto-accept posture with mechanical gates, subagents, skills, plugins, MCP; idempotent, approval-gated, self-evolving |
 | [`prompts/upgrade-live-project-preamble.md`](prompts/upgrade-live-project-preamble.md) | Companion preamble — prepend to a setup prompt when the target project is already **live** (runs in flight, current state files) to force audit-and-upgrade mode with explicit do-not-touch constraints |
@@ -32,15 +33,13 @@ Pick by what you're setting up:
   demonstrated → [`setup-engineering-system.md`](prompts/setup-engineering-system.md)
 - **ML research** — success means a defensible claim from expensive experiments →
   [`setup-ml-research-system.md`](prompts/setup-ml-research-system.md)
-- **A research question ground unattended** — you have a brief and a methodology
-  space, and what limits you is the *number of hand-carried turns* rather than the
-  difficulty of the science →
-  [`setup-autonomous-research-campaign.md`](prompts/setup-autonomous-research-campaign.md).
-  It runs the claim autonomously, which the other two prompts refuse, and pays for
-  it: the burden of proof on *failure* is higher than on success, the confirmation
-  split is sequestered from the search loop, and the terminal verdict is adjudicated
-  by a context that did not run the experiments. Its output is a defended draft
-  conclusion — one human turn per campaign — not a validated claim.
+- **A research question ground unattended** → no prompt builds that any more.
+  Delegate the mechanically verifiable subgoals to the goal loop, run the search on
+  an autoresearch substrate if you have one, and let the ML-research system
+  adjudicate the output as an executor result — its premature-verdict defenses carry
+  the dead-end burden for any loop that ran unattended. The retired campaign prompt
+  stays in `reference/` for a multi-day campaign that needs the full discipline
+  while the loop is still running.
 - **Unattended goal-grinding** →
   [`setup-autonomous-goal-loop.md`](prompts/setup-autonomous-goal-loop.md), but
   only for goals passing its **autonomy test**: every success criterion
@@ -58,19 +57,22 @@ Pick by what you're setting up:
   [`review-plan-blind.md`](prompts/review-plan-blind.md) in a separate session, at
   every stage gate — requirements before design, design before plan — because a
   wrong objective is cheapest to catch at the first gate and fatal at the last.
+- **A plan to run without losing it** — plan first, review it blind, execute one
+  step per fresh context, and never call it done early →
+  [`run-plan-stepwise.md`](prompts/run-plan-stepwise.md), inside whichever system
+  exists. Its intent capture is also the cheapest gate for a research question: the
+  decision the answer informs is written down before anyone formalizes the question.
 - **The project is already live** — runs in flight, current state files →
   prepend [`upgrade-live-project-preamble.md`](prompts/upgrade-live-project-preamble.md)
   to whichever prompt applies.
 
-The four system prompts **compose in one project**. The normal pairing is
+The three system prompts **compose in one project**. The normal pairing is
 research or engineering as the primary, human-in-the-loop system, plus the goal
 loop installed alongside for the subgoals that pass the autonomy test
 (reproduce a baseline, make a suite green, push a pre-registered metric past a
-threshold), and the research campaign for a whole question you want ground
-overnight. Each prompt's hybrid/delegation section defines the seam; the short
+threshold). Each prompt's hybrid/delegation section defines the seam; the short
 version: unattended outcomes are *evidence* the primary system adjudicates — `done`
-is not a validated claim, a campaign's terminal verdict is a defended draft, and an
-exhausted budget is "stalled", never "not
+is not a validated claim, and an exhausted budget is "stalled", never "not
 achievable". Co-installed does not mean co-located: give the unattended loop its
 own working tree or clone. Ownership tables are written per *file*, so they can't
 see a per-*tree* collision, and the damage isn't lost work — it's gates and metrics
@@ -117,7 +119,10 @@ answers. A typical sequence for a research project:
    kickoff spec in the folder the interview mostly confirms it. The system it
    builds then owns `problems.md`, the goals doc, ADRs, and the rest.
 4. Work through the system it built: pre-register the claim, build the frozen
-   harness, iterate with the human-in-the-loop protocol.
+   harness, iterate with the human-in-the-loop protocol. Any multi-step piece of
+   work runs through `run-plan-stepwise.md`, which adopts the system's files: the
+   plan is reviewed blind before its first step and executed one step per fresh
+   context.
 5. When concrete subgoals pass the autonomy test and you want them ground
    unattended, paste `setup-autonomous-goal-loop.md` into a new session at the
    same root — it audits the existing setup and installs the loop alongside it.
@@ -146,7 +151,7 @@ The prompts distinguish two established states:
 ## Design philosophy
 
 These prompts deliberately avoid strict, frozen rulebooks. Each system prompt
-carries all five of the following; the two workflow prompts carry the first two
+carries all five of the following; the three workflow prompts carry the first two
 in miniature and exist for the fourth:
 
 - **A small set of hard invariants** — anti-fabrication, append-only history,
@@ -164,10 +169,12 @@ in miniature and exist for the fourth:
   rather than a filing cabinet: the fix for a long session losing its earlier
   decisions is a written record the agent re-reads, never a longer instruction file.
 - **The author never grades its own work** — the blind reviewer at a spec's stage
-  gates, the context-free reader that dry-runs a bootstrap, the campaign's
-  adjudicator that never ran the experiments, the read-only critic in every loop.
-  A session that produced a thing will pass it; the check has to live in a context
-  that cannot remember producing it.
+  gates, the context-free reader that dry-runs a bootstrap, the fresh-context
+  adjudicator of an unattended loop's dead-end claim, the read-only critic in every loop,
+  the plan reviewer that sees a step plan before its first step runs, and the
+  validator that checks a done claim without having executed it. A session that
+  produced a thing will pass it; the check has to live in a context that cannot
+  remember producing it.
 - **A self-evolution loop** — the generated system retros itself, prunes rules
   that never fire, amends itself with dated version bumps, and re-checks current
   harness capabilities (hooks, subagents, memory, …) at each phase boundary. The
@@ -200,11 +207,12 @@ which vintage of the protocol a given project is still running. The machine prom
 goes further: its Phase A re-reviews the prompt itself on every run and proposes
 amendments before acting. The prompts are living documents.
 
-## Reference
+## Retired
 
-`reference/legacy-strict-template/` holds the original v1 fixed boilerplate
-(two-role Lead/Scientist protocol with fully specified role files). It's
-superseded as a copy-paste artifact but kept as prior art — the battle-tested
-mechanisms in it (pre-reg tamper checks, killed-register, retro checklist,
-frozen-artifact manifests) informed the prompts and remain useful reading when
-deciding which mechanisms a mature project should adopt.
+`reference/` holds retired prompts, frozen as prior art. Currently:
+`setup-autonomous-research-campaign.md`, retired 2026-09-12 — its header says why and
+where its live mechanisms went. The original v1 fixed boilerplate (the two-role
+Lead/Scientist template) was deleted from the tree the same day, after its
+battle-tested mechanisms (pre-reg tamper checks, killed-register, retro checklist,
+frozen-artifact manifests) had long been backported into the prompts; it is
+reachable at commit `bcb6304`, the last one that carried it.

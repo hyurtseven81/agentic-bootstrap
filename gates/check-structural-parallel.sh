@@ -11,7 +11,6 @@ prompts=(
   prompts/setup-ml-research-system.md
   prompts/setup-engineering-system.md
   prompts/setup-autonomous-goal-loop.md
-  prompts/setup-autonomous-research-campaign.md
 )
 
 skeleton() {

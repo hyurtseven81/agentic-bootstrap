@@ -1,6 +1,6 @@
 # Setup Prompt — Dev Machine Provisioning
 
-> **Prompt version: v2 (2026-06-10)** — bump on every amendment. Phase A proposes
+> **Prompt version: v3 (2026-09-12)** — bump on every amendment. Phase A proposes
 > amendments to this file; after approval, backport them to the canonical copy in
 > the prompts repo.
 
@@ -117,6 +117,14 @@ Amazon Linux/dnf typically `gcc make`, or the distro's build-essential equivalen
 the exact (likely sudo) command and ASK before running. If sudo/egress is blocked, note it
 and carry the constraint into Phase 5's fallback logic.
 
+Also the Claude Code sandbox prerequisites, where the platform needs them (the harness
+setup prompt VERIFIES them; this prompt installs them): on Linux/WSL2, `bubblewrap` and
+`socat` from the native package manager, plus the optional seccomp filter
+(`npm install -g @anthropic-ai/sandbox-runtime`) once node exists in Phase 2; on Ubuntu
+24.04+ the default AppArmor policy blocks bubblewrap's user namespaces — apply the fix
+the sandbox docs describe, and ASK before any sudo. macOS needs nothing (Seatbelt is
+built in); native Windows has no sandbox — say so rather than faking it.
+
 ## Phase 2 — Runtimes (mise) + uv + direnv
 Install/activate mise; install python, node (required for Mason/LSPs), rust. Also install
 uv (Astral) as my Python project/dependency/venv manager.
@@ -158,10 +166,10 @@ Platform implementation:
   real tmux if I want it. Do not silently fake it.
 
 ## Phase 5 — Neovim / LazyVim (all platforms)
-Ensure the current STABLE nvim (minimum 0.10; prefer latest stable — LazyVim's floor
-moves, check it). Install LazyVim (starter) if absent; respect lazy-lock.json if my
-config exists. Apply my VS Code-like defaults via LazyVim's lua/plugins/ override pattern
-(NEVER edit core files) — see LazyVim SPEC, including the SINGLE-EXPLORER requirement.
+Ensure the current STABLE nvim (LazyVim required >= 0.11.2 at authoring time and its
+floor moves — check it; prefer latest stable). Install LazyVim (starter) if absent;
+respect lazy-lock.json if my config exists. Apply my VS Code-like defaults via
+LazyVim's lua/plugins/ override pattern (NEVER edit core files) — see LazyVim SPEC, including the SINGLE-EXPLORER requirement.
 
 Mason LSP/tools: python (basedpyright + ruff), typescript (vtsls + eslint), rust
 (rust-analyzer), lua, json, yaml, bash, toml, docker, markdown. Mason pulls from
@@ -219,7 +227,8 @@ Install; confirm it picks up delta/diff config.
 - Re-run inventory; nvim :checkhealth clean (incl. nvim-treesitter, no compiler errors);
   EXACTLY ONE file-explorer sidebar opens; multiplexer loads (where applicable); shell
   starts with no errors; truecolor test passes; uv/duckdb/jupytext/gitleaks/pre-commit
-  are installed and runnable (report versions).
+  are installed and runnable (report versions); on Linux/WSL2 the Claude Code sandbox
+  prerequisites (bubblewrap, socat) are present.
 - EMIT A DOCTOR SCRIPT: write every check above into `~/.devsetup/verify.sh` (or .ps1 on
   native Windows) so the whole verification suite re-runs on demand later — environment
   health must be checkable without re-running this prompt. Run it once; it must pass.
@@ -279,7 +288,8 @@ Required outcomes (choose mechanism; VERIFY):
 Fixed choices: shell-integration-features includes ssh-terminfo; my font/theme/ligatures
 (ask me if unset).
 - Pin/refresh to the latest STABLE Ghostty before configuring, and RECORD the installed
-  version (mouse-reporting behavior shifted across 1.2 -> 1.3.x). Mouse reporting over
+  version (mouse-reporting behavior shifted across 1.2 -> 1.3.x; 1.3.1 was current at
+  authoring time). Mouse reporting over
   SSH -> tmux is a VERIFIED outcome (see tmux SPEC), not assumed.
 Required outcomes (verify over SSH): truecolor renders; undercurl renders; remote
 terminfo resolves so `clear` and TUIs work without errors.
