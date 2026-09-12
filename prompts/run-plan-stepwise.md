@@ -1,6 +1,6 @@
 # Workflow Prompt — Plan, Review Blind, Run Step by Step
 
-> **Prompt version: v1 (2026-09-12)** — bump on every amendment; cite the lesson or
+> **Prompt version: v2 (2026-09-12)** — bump on every amendment; cite the lesson or
 > incident that motivated it in the commit message.
 
 **How to use:** open an agent session (Claude Code or equivalent, strongest available
@@ -316,10 +316,8 @@ Inside the engineering system, the plan is the spec's task list and the driver r
 under its review loop and gates. Inside the goal loop, the loop's iterations consume
 this plan's steps in order — each iteration's Plan step is the next open step, never
 an invented one — and `done` there additionally requires every step here closed.
-Inside the research campaign, each iteration's proposal is a one-step plan under the
-campaign's own review and critique. Whichever applies: this workflow adopts the
-installed system's names and files, adds only what is missing, and never stands up a
-second ledger beside a working one.
+Whichever applies: this workflow adopts the installed system's names and files, adds
+only what is missing, and never stands up a second ledger beside a working one.
 
 Sibling references are pointers for the human, not files to read: each is a
 separate, self-contained prompt from the same collection this one came from,

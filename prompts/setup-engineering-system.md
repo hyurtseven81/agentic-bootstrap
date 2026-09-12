@@ -1,6 +1,6 @@
 # Setup Prompt — Agentic Engineering Development System
 
-> **Prompt version: v9 (2026-09-12)** — bump on every amendment; cite the lesson or
+> **Prompt version: v10 (2026-09-12)** — bump on every amendment; cite the lesson or
 > incident that motivated it in the commit message.
 
 **How to use:** open an agent session (Claude Code or equivalent, strongest available
@@ -238,14 +238,12 @@ append-only records rather than replacing them. A model asked to rewrite its own
 accumulating notes reliably loses more than it saves.
 
 When the topology has a split (a planner/architect session feeding an implementer),
-separate the *carry* from the *record*. Carry: have each session emit its hand-off as
-a fenced code block and use the harness's native code-block copy (the copy button on
-web/desktop) — symmetric in both directions, so neither session is "the one that emits
-a file" and the other chat text. Don't build a bespoke copy command — a slash command
-can't reach the clipboard except via OS-specific shell tools (`pbcopy`/`xclip`) that
-fail on web and over SSH; build one only where probing shows none. Record:
-the decision records and task ledger already hold durable state — add a `handoffs/`
-file only if they're too terse to recover the pending hand-off after a crash.
+separate the *carry* from the *record*. Carry: each session emits its hand-off as a
+fenced code block and the human uses the harness's native code-block copy; don't
+build a bespoke copy command, which reaches the clipboard only through OS-specific
+tools that fail on web and over SSH. Record: the decision records and task ledger
+already hold durable state — add a `handoffs/` file only if they're too terse to
+recover the pending hand-off after a crash.
 
 ### Test strategy — shaped to the contract surface
 

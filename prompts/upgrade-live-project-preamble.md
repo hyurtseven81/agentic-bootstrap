@@ -1,15 +1,14 @@
 # Preamble — Applying a Setup Prompt to a LIVE Project
 
-> **Prompt version: v5 (2026-09-07)** — bump on every amendment; cite the lesson or
+> **Prompt version: v6 (2026-09-12)** — bump on every amendment; cite the lesson or
 > incident that motivated it in the commit message.
 
 **How to use:** when the target project is already operating — role files in active
 use, state files current, possibly an expensive run in flight — open a **fresh**
 agent session at the project root, paste this preamble first (editing the bracketed
 lines), then paste the full setup prompt (`setup-ml-research-system.md`,
-`setup-engineering-system.md`, `setup-autonomous-goal-loop.md`, or
-`setup-autonomous-research-campaign.md`) below it in the same message. Do not run
-the upgrade inside an existing role session.
+`setup-engineering-system.md`, or `setup-autonomous-goal-loop.md`) below it in the
+same message. Do not run the upgrade inside an existing role session.
 
 ---
 
