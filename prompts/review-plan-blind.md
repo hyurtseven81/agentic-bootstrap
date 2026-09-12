@@ -1,6 +1,6 @@
 # Review Prompt — Blind Assessment of a Spec, Design, or Plan
 
-> **Prompt version: v2 (2026-09-12)** — bump on every amendment; cite the lesson or
+> **Prompt version: v3 (2026-09-12)** — bump on every amendment; cite the lesson or
 > incident that motivated it in the commit message.
 
 **How to use:** open a **fresh** session — never the one that produced the document,
@@ -22,8 +22,8 @@ separate human session above remains the stronger form.
 Scope: planning artifacts — a requirements document, a technical design, a task or
 experiment plan, a research brief, a pre-registration, a decision record. Not code
 review: that belongs to the development system's own reviewer. Its natural pair in
-this collection is `kickoff-spec-first-project.md`, but any document meeting the
-inputs above can be reviewed.
+this collection is `plan-review-execute.md`, but any document meeting the inputs
+above can be reviewed.
 
 This prompt describes **intent and principles, not a fixed procedure**. Use whatever
 the harness offers — fetch the sources, run the arithmetic in a script, keep working

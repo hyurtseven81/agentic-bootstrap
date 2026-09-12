@@ -5,13 +5,14 @@
 
 > **Retired 2026-09-12 — kept as prior art, nothing routes here any more.** Its one
 > irreplaceable idea, the dead-end burden checked by a context that did not run the
-> experiments, now lives in `setup-ml-research-system.md`'s premature-verdict
-> defenses; unattended search runs on the goal loop or an autoresearch substrate,
-> with the ML-research system adjudicating the output. Reason: two commits at
-> creation and no incident-driven amendment since, while the mechanics it specified
-> abstractly now exist as products. Resurrect it only for a multi-day unattended
-> campaign in which a premature dead end must be caught while the loop is still
-> running.
+> experiments, now lives in the premature-verdict defenses of
+> `setup-agentic-system.md` (first in `setup-ml-research-system.md`, which that
+> prompt absorbed as its research profile the same day); unattended search runs on
+> that prompt's goal-loop profile or an autoresearch substrate, with the research
+> profile adjudicating the output. Reason: two commits at creation and no
+> incident-driven amendment since, while the mechanics it specified abstractly now
+> exist as products. Resurrect it only for a multi-day unattended campaign in which
+> a premature dead end must be caught while the loop is still running.
 
 **How to use:** open an agent session (Claude Code or equivalent, strongest available
 model) at the root of your research project — empty or existing — and paste this
