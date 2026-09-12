@@ -215,4 +215,4 @@ where its live mechanisms went. The original v1 fixed boilerplate (the two-role
 Lead/Scientist template) was deleted from the tree the same day, after its
 battle-tested mechanisms (pre-reg tamper checks, killed-register, retro checklist,
 frozen-artifact manifests) had long been backported into the prompts; it is
-reachable at the git tag `legacy-strict-template`.
+reachable at commit `bcb6304`, the last one that carried it.

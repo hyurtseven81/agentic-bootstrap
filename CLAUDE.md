@@ -44,5 +44,5 @@ govern sessions in this repo.
   backport lessons into the live prompts instead. A retirement is a `git mv` into
   `reference/` with a dated note at the top saying why and where the live
   mechanisms went. The original v1 boilerplate was deleted from the tree on
-  2026-09-12 and is reachable at the git tag `legacy-strict-template`.
+  2026-09-12 and is reachable at commit `bcb6304`, the last one that carried it.
 - Conventional commits (`feat(prompts):`, `docs(readme):`, …).
