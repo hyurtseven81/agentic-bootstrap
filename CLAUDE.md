@@ -31,13 +31,13 @@ NOT govern sessions in this repo.
   structural parallel where their content overlaps (recon → interview →
   invariants → principles → build → verify → evolution loop) so lessons can be
   backported across them easily.
-- `kickoff-spec-first-project.md` and `review-plan-blind.md` are *workflow* prompts,
-  not system prompts: they run before or beside a system rather than building one,
-  so they are deliberately outside the structural-parallel gate. Keep the review
-  prompt blind — it may name its kickoff sibling for the human, but must never
-  describe what that prompt asked the author to produce: its lenses are field
-  standards, not the kickoff's section list. A reviewer that knows the rubric
-  grades the rubric.
+- `kickoff-spec-first-project.md`, `review-plan-blind.md`, and `run-plan-stepwise.md`
+  are *workflow* prompts, not system prompts: they run before or beside a system
+  rather than building one, so they are deliberately outside the structural-parallel
+  gate. Keep the review prompt blind — it may name its kickoff sibling for the human,
+  but must never describe what that prompt asked the author to produce: its lenses
+  are field standards, not the kickoff's section list. A reviewer that knows the
+  rubric grades the rubric.
 - `reference/legacy-strict-template/` is frozen prior art — don't extend it;
   backport lessons into the prompts instead.
 - Conventional commits (`feat(prompts):`, `docs(readme):`, …).
