@@ -1,11 +1,16 @@
 # Setup Prompt — Workstation: Dev Machine and Claude Code Harness
 
-> **Prompt version: v9 (2026-09-12)** — bump on every amendment; cite the lesson or
+> **Prompt version: v10 (2026-09-17)** — bump on every amendment; cite the lesson or
 > incident that motivated it in the commit message. Numbering continues from
 > `setup-claude-code.md` (v8), which this file absorbs together with
-> `setup-dev-machine.md` (v3). Phase A re-evaluates this file every run and proposes
-> amendments when stale; after approval, backport them to the canonical copy in the
-> prompts repo.
+> `setup-dev-machine.md` (v3). v10: the profile widened from Python/ML-only to
+> Python/ML + Go + Rust + Terraform infra + React / React Native (Phase 2b, Phase 5
+> lists, machine SPEC); the primary local desktop became a Fedora aarch64 VM under
+> UTM on an 8 GB Apple Silicon host (Phase 0 detection, Phase 1 Fedora notes, the
+> UTM SPEC section); and the harness gained a privacy posture (harness SPEC, Phase
+> H0/H3) after deciding this box is identity-separated. Phase A re-evaluates this
+> file every run and proposes amendments when stale; after approval, backport them
+> to the canonical copy in the prompts repo.
 
 **How to use:** open an agent session (Claude Code or equivalent, strongest available
 model) on the target machine, in any directory, and paste this entire prompt. It has
@@ -21,6 +26,13 @@ before every mutating unit.
 You are provisioning MY dev environment. Target may be:
 - macOS (local desktop)
 - Linux (local desktop OR a remote Amazon dev-dsk: headless, behind a corporate egress proxy)
+- Linux aarch64 desktop VM: Fedora Workstation under UTM (Apple Virtualization backend,
+  Rosetta binfmt) on an Apple Silicon Mac — my primary local box. It is used over SSH +
+  tmux by default and in the GNOME session only occasionally, so it is BOTH a local
+  desktop (Phase 8 applies) and an SSH target (the cross-host tmux path applies, with
+  the Mac's terminal as the outer emulator). aarch64 is a first-class arch here: a tool
+  with no aarch64 build is reported, never silently substituted, and amd64-only
+  binaries run through Rosetta when it is mounted (Phase 0 detects it).
 - Windows (native), OR Windows running this inside WSL2 (treat WSL2 as Linux)
 
 Works on a FRESH machine or one already partly set up — detect, then install-or-update.
@@ -119,7 +131,11 @@ to any remote.
 ## Phase 0 — Detect & inventory (READ-ONLY)
 
 Machine: ## Phase 0 — Detect & inventory (READ-ONLY)
-Report: OS + distro/version, arch, GUI-vs-headless, native-Windows-vs-WSL2, shell, and
+Report: OS + distro/version, arch, GUI-vs-headless, native-Windows-vs-WSL2, shell,
+virtualization (`systemd-detect-virt`; on the UTM box: whether Rosetta is mounted and
+registered — `/media/rosetta/rosetta` exists and `/proc/sys/fs/binfmt_misc/rosetta` is
+enabled — and whether `spice-vdagent` is active), RAM and swap/zram (the 8 GB VM gets
+the memory guards in the UTM SPEC; a bigger box does not), and
 proxy status (test reachability to github.com, registry.npmjs.org, pypi.org; note TLS
 interception if certificates don't chain to public roots). Read `~/.devsetup/runs/` if
 it exists and summarize the last run's end state. Inventory every tool below with
@@ -143,7 +159,9 @@ per SPEC item. If a prior run report exists, summarize its end state first.
 
 Machine: ## Phase A — Best-practice review & SELF-EVOLVE (every run, BEFORE the plan)
 Critically evaluate whether anything in THIS command is now outdated or has a better
-option for my profile (senior ML/eng, Python-heavy, heavy remote-SSH work). Consult
+option for my profile (senior ML/eng; Python-heavy plus Go, Rust, Terraform infra and
+React / React Native frontend; heavy remote-SSH work; local desktop is an aarch64 VM
+used occasionally for GUI). Consult
 current release notes / docs / web search where available — do not rely on training
 data for version claims. Review categories, explicitly including: core CLI/shell/editor
 tooling; data/ML/notebook workflow tooling; repo-hygiene & secret-scanning tooling; and
@@ -151,7 +169,12 @@ a cleaner mechanism for any "required outcome." Look for deprecated tools, super
 defaults, better-maintained alternatives, renamed config keys, and new must-have tools.
 Standing re-evaluation candidates (check, don't assume): basedpyright vs newer Python
 type checkers (e.g. Astral's `ty` once stable), oh-my-zsh plugin maintenance status,
-whether any SPEC workaround's upstream bug is now fixed.
+whether any SPEC workaround's upstream bug is now fixed, Terraform vs OpenTofu for my
+providers (licence and provider-registry parity — ask before switching), the current
+Go linter/formatter pair (golangci-lint + gofumpt at authoring time), whether the RN
+toolchain still needs a JDK on the Linux side or has moved to a host-only build path,
+and whether Fedora now packages any tool this prompt pulls from a COPR or a release
+tarball (prefer the distro package once it exists).
 If you find improvements:
 1) STOP before mutating anything.
 2) Explain each change and WHY, with tradeoffs.
@@ -182,6 +205,12 @@ after I approve. If nothing is stale, say so in one line and continue.
 - macOS: Homebrew (install if missing). Ensure Xcode Command Line Tools (clang/make).
 - Linux (incl. WSL2): NATIVE package manager (detect apt/dnf/yum/pacman/zypper). Avoid
   Linuxbrew on a managed corporate box unless already present.
+  Fedora specifics: `dnf` is dnf5; Fedora 45+ enforces RPM signature verification by
+  default, so a third-party repo (HashiCorp, a COPR, Microsoft's VS Code repo) needs
+  its GPG key imported — never `--nogpgcheck`, never a disabled repo left enabled.
+  Prefer Fedora's own package, then a maintained COPR (record its owner as the
+  supply-chain source), then mise/npm, then a vendor tarball. Flatpak (Flathub) for
+  GUI apps only. Do not install snap.
 - Windows (native): prefer scoop for CLI dev tools (no-admin, brew-like) and winget for
   apps; choco as fallback. Choose per tool availability.
 - Prefer mise for language runtimes/CLI where it has solid support on the platform.
@@ -203,7 +232,9 @@ the sandbox docs describe, and ASK before any sudo. macOS needs nothing (Seatbel
 built in); native Windows has no sandbox — say so rather than faking it.
 
 ## Phase 2 — Runtimes (mise) + uv + direnv
-Install/activate mise; install python, node (required for Mason/LSPs), rust. Also install
+Install/activate mise; install python, node (required for Mason/LSPs; also my frontend
+runtime — enable `corepack` so per-repo `packageManager` fields pin pnpm/yarn), rust,
+go, terraform (see Phase 2b for the surrounding toolchains). Also install
 uv (Astral) as my Python project/dependency/venv manager.
 Division of labor (configure to coexist, don't let them fight):
 - mise owns base language RUNTIMES.
@@ -214,6 +245,36 @@ Division of labor (configure to coexist, don't let them fight):
   project dir vs outside one).
 (Windows native: mise/uv support is generally good; for anything mise can't provide, fall
 back to scoop/winget and report it.)
+
+## Phase 2b — Infra, Go and frontend toolchains (all platforms; headless-safe)
+Each unit below exists because I work in that stack daily; the RULE BUDGET still
+applies inside each unit — install the named tools, not their whole ecosystems.
+- **Terraform (infra):** `terraform` via mise, pinned globally to the latest stable and
+  overridable per repo (`.terraform-version` / `mise.toml` — honour whichever a repo
+  already has). Plus `tflint` (with the AWS/GCP/Azure ruleset plugins only for the
+  clouds I name in the interview) and `terraform-docs`; `terraform-ls` and `tflint`
+  also go to Mason for nvim. On the aarch64 VM, verify Rosetta by running one
+  amd64-only provider download in a scratch `terraform init` — a provider with no
+  `linux_arm64` build must run, not fail; if Rosetta is absent, report it as the
+  cause and stop (never suggest `--nogpgcheck`-class workarounds or a manual
+  provider mirror without asking). Terraform state and `*.tfvars` are secrets:
+  the harness SPEC denies reads of them, and the gitleaks template ignores neither.
+- **Go:** `go` via mise (latest stable; per-repo `go.mod` toolchain lines win). Keep the
+  default `GOPATH=~/go` and put `~/go/bin` on PATH in a managed block; install
+  `gopls`, `gofumpt`, `golangci-lint`, `dlv` via `go install` at pinned versions (or
+  mise where it has them) and hand the LSP/linter pair to Mason. Required outcome:
+  `go build ./...` and `golangci-lint run` on a scratch module succeed with no CGO
+  toolchain error (Phase 1 gcc covers this).
+- **Frontend (React / React Native):** node LTS via mise + `corepack enable`;
+  `watchman` from the native package manager (Metro and jest file watching — the
+  failure mode is silent stale bundles without it); `eas-cli` global via the mise
+  node; `java-17-openjdk-devel` (or the JDK the current RN release documents — verify)
+  from the native package manager for Gradle/Android JVM tooling. Mason: `vtsls`,
+  `eslint`, `prettier`, `css-lsp`, `html-lsp`, `tailwindcss-language-server`. The
+  Android SDK and emulator and the iOS Simulator are NOT installed in a VM: nested
+  virtualization needs M3+ hosts and the iOS side needs Xcode; record them as
+  DEFERRED-to-host with the reason, and note the working split (Metro / Expo dev
+  server in the VM, emulator or device on the Mac, both on the shared network).
 
 ## Phase 3 — Shell layer
 FIXED CHOICES (preserve behavior across platforms):
@@ -248,14 +309,23 @@ floor moves — check it; prefer latest stable). Install LazyVim (starter) if ab
 respect lazy-lock.json if my config exists. Apply my VS Code-like defaults via
 LazyVim's lua/plugins/ override pattern (NEVER edit core files) — see LazyVim SPEC, including the SINGLE-EXPLORER requirement.
 
-Mason LSP/tools: python (basedpyright + ruff), typescript (vtsls + eslint), rust
-(rust-analyzer), lua, json, yaml, bash, toml, docker, markdown. Mason pulls from
+Prefer LazyVim's own language extras (`lang.python`, `lang.typescript`, `lang.rust`,
+`lang.go`, `lang.terraform`, `lang.json`, `lang.yaml`, `lang.docker`, `lang.markdown`,
+`lang.tailwind`) enabled via `lazyvim.json` over hand-authored LSP specs — an extra is
+maintained upstream, a hand-authored spec rots. Add plugin overrides only for what an
+extra doesn't do.
+
+Mason LSP/tools: python (basedpyright + ruff), typescript (vtsls + eslint + prettier),
+rust (rust-analyzer), go (gopls + gofumpt + golangci-lint), terraform (terraform-ls +
+tflint), css/html (css-lsp, html-lsp, tailwindcss-language-server), lua, json, yaml,
+bash, toml, docker, markdown. Mason pulls from
 GitHub/npm/PyPI and may be proxy-blocked — if so, list exactly what failed and propose
 proxy/mirror options.
 
 nvim-treesitter (compiles grammars from C source — depends on the Phase 1 toolchain):
 - After install, run :TSInstall for my core languages (python, lua, bash, json, yaml,
-  toml, markdown, rust, typescript) and require :checkhealth nvim-treesitter to be clean.
+  toml, markdown, rust, typescript, tsx, javascript, css, html, go, gomod, gosum, hcl,
+  terraform, dockerfile) and require :checkhealth nvim-treesitter to be clean.
 - If grammar compilation throws compiler errors (common on Amazon Linux), fix in this
   order, stopping at the first that works:
   1) Ensure the Phase 1 C toolchain is present (gcc/clang + make + headers); retry.
@@ -281,13 +351,21 @@ the hard rules. All are headless-safe (no GUI).
   - Install both as machine-level tools.
   - pre-commit is per-repo: do NOT auto-install hooks into my existing repos. Instead,
     provide a recommended .pre-commit-config.yaml template (ruff lint+format, gitleaks
-    secret scan) that I can drop into a repo and `pre-commit install` myself. Offer to
-    add it to a specific repo only if I name one.
+    secret scan; plus `terraform fmt`/`tflint` and `gofmt`/`golangci-lint` hooks as
+    commented-out stanzas to enable per repo) that I can drop into a repo and
+    `pre-commit install` myself. Offer to add it to a specific repo only if I name one.
   - Confirm gitleaks runs standalone (e.g. `gitleaks detect`) as well.
 
 ## Phase 6 — git (all platforms)
 delta as pager + sensible defaults. Ask for user.name/user.email rather than guessing if
-unset.
+unset — and NEVER let git fall back to the account's GECOS full name or `user@host`:
+on the identity-separated box the identity is my forge handle and the forge's
+`noreply` address (ask me for both; the failure mode is a real name leaking into
+every commit). Commit signing with an SSH key (`gpg.format ssh`,
+`commit.gpgsign true`, the signing key = my forge SSH key) rather than a GPG identity.
+Credential storage: over SSH there is no desktop keyring session (Fedora 45 moved to
+`oo7` besides), so use SSH remotes + `gh auth` with the SSH key, not a libsecret
+credential helper; report if a repo remote is still HTTPS.
 
 ## Phase 7 — lazygit (all platforms)
 Install; confirm it picks up delta/diff config.
@@ -299,13 +377,23 @@ Install; confirm it picks up delta/diff config.
   WezTerm (cross-platform, GPU-accelerated, closest to Ghostty). Configure truecolor +
   a Nerd Font. Tell me this is the substitution.
 - All desktops: VS Code app + Remote-SSH + the Neovim extension.
+- On the UTM VM: `spice-vdagent` and `qemu-guest-agent` from dnf (clipboard sync and
+  dynamic resolution — the failure mode is no host clipboard in the GNOME session);
+  Ghostty from Fedora's package if present, else a maintained COPR (supply-chain rule).
+  The OUTER terminal for daily work is Ghostty on the Mac host; the in-VM Ghostty is
+  for the occasional GNOME session only, so the Phase 9 mouse smoke test runs from the
+  host over SSH AND from the VM console, reported separately.
 
 ## Phase 9 — Verify & report
 - Re-run inventory; nvim :checkhealth clean (incl. nvim-treesitter, no compiler errors);
   EXACTLY ONE file-explorer sidebar opens; multiplexer loads (where applicable); shell
   starts with no errors; truecolor test passes; uv/duckdb/jupytext/gitleaks/pre-commit
-  are installed and runnable (report versions); on Linux/WSL2 the Claude Code sandbox
-  prerequisites (bubblewrap, socat) are present.
+  are installed and runnable (report versions); go/gopls/golangci-lint,
+  terraform/tflint/terraform-docs, node/corepack/pnpm/watchman/eas-cli and the JDK
+  are installed and runnable (report versions; `terraform init` of the scratch
+  amd64-provider fixture succeeds on the aarch64 VM); on Linux/WSL2 the Claude Code
+  sandbox prerequisites (bubblewrap, socat) are present; on the UTM VM Rosetta is
+  registered and `spice-vdagent` is active in a GNOME session.
 - EMIT A DOCTOR SCRIPT: write every check above into `~/.devsetup/verify.sh` (or .ps1 on
   native Windows) so the whole verification suite re-runs on demand later — environment
   health must be checkable without re-running this prompt. Run it once; it must pass.
@@ -338,7 +426,10 @@ Ask only what Phase 0 couldn't answer:
   denies and hook guards are seeded from THESE answers, never from guesses.
 - Preferences with no safe default: telemetry posture, transcript retention
   (`cleanupPeriodDays`), commit and PR attribution (the `attribution` key at
-  authoring time; `includeCoAuthoredBy` is its deprecated predecessor).
+  authoring time; `includeCoAuthoredBy` is its deprecated predecessor). On the
+  identity-separated box these are DECIDED by the harness SPEC's Privacy bullet —
+  confirm them in one line rather than re-asking, and ask only where the SPEC says
+  "ask".
 
 ## Phase H1 — Model, context, reasoning
 
@@ -638,6 +729,39 @@ Required outcomes (choose mechanism; VERIFY):
   mouse support. Apply per the UPSTREAM-BUG WORKAROUNDS hard rule: gated on detected
   emulator+version, cited, removable, idempotent.
 
+### Go / Terraform / Frontend (all platforms)
+Fixed choices: mise owns the `go`, `terraform` and `node` runtimes; per-repo pins win
+over the global pin; `GOPATH=~/go`; `corepack` on; `watchman` from the distro; RN's
+Android SDK/emulator and iOS tooling live on the Mac host, never in the VM.
+Required outcomes (verify with scratch fixtures, then delete them):
+- `terraform init` + `validate` on a fixture using one provider that ships no
+  `linux_arm64` build succeeds on the aarch64 VM (proves Rosetta end to end).
+- `tflint --init && tflint` and `terraform-docs markdown .` run on the fixture.
+- `go build ./... && golangci-lint run` on a fixture module; `gopls` attaches in nvim
+  with zero diagnostics on the fixture.
+- `pnpm create expo` (or the current RN scaffold) installs, `watchman version` answers,
+  and `npx expo start` reaches "Metro waiting" with a LAN URL the Mac can open.
+- `~/src` exists and is the recorded working root (zoxide, direnv allowlist, harness
+  `blockReadsOutsideWorkingDirectories` all point at it).
+
+### Fedora aarch64 VM under UTM (memory- and host-aware guards)
+These exist because the primary local box has 8 GB fixed at boot and no fan; they are
+gated on Phase 0 detecting the UTM VM AND ≤ 8 GB RAM, and are no-ops elsewhere.
+- Rosetta: `/etc/fstab` virtiofs mount of `rosetta` at `/media/rosetta` (ro, nofail) +
+  `/etc/binfmt.d/rosetta.conf` registration; `systemd-binfmt` restarted; verified by
+  the Terraform fixture above. If the mount tag is absent, the UTM setting is off —
+  report it, do not fake it.
+- Cargo: `[build] jobs = 4` in a managed block of `~/.cargo/config.toml` (rust linking
+  at 8 cores swaps at 8 GB); `CARGO_INCREMENTAL` left default.
+- rust-analyzer / gopls: one workspace per nvim instance is the documented habit —
+  record it in the run report; no config can enforce it.
+- zram is on by default on Fedora Workstation — verify (`zramctl`), do not add a disk
+  swapfile on top.
+- `spice-vdagent` enabled for the GNOME session (Phase 8); `sshd` enabled and the box
+  reachable as `<hostname>.local` from the host via Avahi — verify from the host.
+- Never put repos on a virtiofs shared folder (file-watching and SELinux labelling
+  break); a host share, if any, mounts at `~/mac` for exchange only.
+
 ### Ghostty (macOS/Linux desktop)
 Fixed choices: shell-integration-features includes ssh-terminfo; my font/theme/ligatures
 (ask me if unset).
@@ -694,6 +818,21 @@ be re-verified at run time.)
   tests. Full-bypass mode comes only from me launching with it deliberately, never
   from configuration; unattended drivers built by the project prompts run in
   `dontAsk`.
+- **Privacy (identity-separated box):** the model call is the only traffic this
+  box accepts as necessary. Everything non-essential is OFF at user scope via the
+  settings `env` block — at authoring time `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1`
+  (which also disables usage metrics and error reports) and
+  `DISABLE_FEEDBACK_COMMAND=1`; verify the current names and record the documented
+  side effect (feature-flag evaluation and Remote Control stop working — accepted).
+  Transcript retention short (`cleanupPeriodDays`: ask, default 7). Commit/PR
+  attribution OFF. Credential and state files are unreadable to the harness in every
+  mode: `Read` deny rules for `~/.ssh/**`, `~/.aws/**`, `~/.config/gh/**`,
+  `~/.config/gcloud/**`, `**/.env`, `**/.env.*`, `**/*.tfstate`, `**/*.tfstate.*`,
+  `**/*.tfvars`, `**/terraform.tfstate.d/**`, plus the same paths in the sandbox's
+  `credentials.files`, and `permissions.blockReadsOutsideWorkingDirectories` on with
+  `~/src` as the working root. Each rule is probed in the Phase H6 fixture. The VPN
+  and OS identity choices live outside this prompt; the run report records only
+  that the harness side holds.
 - **Reviewer:** a global read-only reviewer subagent exists at user scope — the
   floor reviewer for projects without a tailored one.
 - **Plugins & MCP:** interview-gated and supply-chain-vetted (source, author, and
